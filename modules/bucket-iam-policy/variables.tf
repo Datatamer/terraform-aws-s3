@@ -1,12 +1,6 @@
 variable "bucket_name" {
-  description = "Name of S3 bucket to create."
+  description = "Name of S3 bucket resource that IAM policies will be created for."
   type        = string
-}
-
-variable "additional_tags" {
-  type        = map(string)
-  description = "Additional tags to be attached to the S3 bucket."
-  default     = {}
 }
 
 variable "read_only_paths" {

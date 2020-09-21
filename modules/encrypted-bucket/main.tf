@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "new_bucket" {
 resource "aws_s3_bucket_policy" "sse_bucket_policy" {
   bucket = aws_s3_bucket.new_bucket.id
   policy = templatefile(
-    "${path.root}/bucket-policy.json",
+    "${path.module}/bucket-policy.json",
     { bucket_name = aws_s3_bucket.new_bucket.id }
   )
 }
