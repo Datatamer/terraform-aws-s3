@@ -24,21 +24,20 @@ This modules creates:
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
+| aws | >= 2.45.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | >= 2.45.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| bucket\_name | Name of S3 bucket to create. | `string` | `n/a` | yes |
+| bucket\_name | Name of S3 bucket to create. | `string` | n/a | yes |
 | additional\_tags | Additional tags to be attached to the S3 bucket. | `map(string)` | `{}` | no |
-
-**TODO**: Add option for KMS S3 encryption.
 
 ## Outputs
 
@@ -52,19 +51,6 @@ This modules creates:
 This repo is based on:
 * [terraform standard module structure](https://www.terraform.io/docs/modules/index.html#standard-module-structure)
 * [templated terraform module](https://github.com/tmknom/template-terraform-module)
-
-# Development
-## Generating Docs
-Run `make terraform/docs` to generate the section of docs around terraform inputs, outputs and requirements.
-
-## Checkstyles
-Run `make lint`, this will run terraform fmt, in addition to a few other checks to detect whitespace issues.
-NOTE: this requires having docker working on the machine running the test
-
-## Releasing new versions
-* Update version contained in `VERSION`
-* Document changes in `CHANGELOG.md`
-* Create a tag in github for the commit associated with the version
 
 # License
 Apache 2 Licensed. See LICENSE for full details.

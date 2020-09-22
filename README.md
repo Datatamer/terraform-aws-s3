@@ -32,23 +32,22 @@ This modules creates:
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
+| aws | >= 2.45.0 |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| aws | n/a |
+No provider.
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| bucket\_name | Name of S3 bucket to create. | `string` | `n/a` | yes |
-| read\_only\_paths | List of bucket paths that should be attached to a read-only policy. | `list(string)` | `[]` | no |
-| read\_write\_paths | List of bucket paths that should be attached to a read-write policy. | `list(string)` | `[]` | no |
-| read\_only\_actions | List of actions that should be permitted by a read-only policy. | `list(string)` | <pre>[<br>  "s3:Get*",<br>  "s3:List*",<br>]</pre> | no |
-| read\_write\_actions | List of actions that should be permitted by a read-write policy. | `list(string)` | <pre>[<br>  "s3:GetBucketLocation",<br>  "s3:GetBucketCORS",<br>  "s3:GetObjectVersionForReplication",<br>  "s3:GetObject",<br>  "s3:GetBucketTagging",<br>  "s3:GetObjectVersion",<br>  "s3:GetObjectTagging",<br>  "s3:ListMultipartUploadParts",<br>  "s3:ListBucketByTags",<br>  "s3:ListBucket",<br>  "s3:ListObjects",<br>  "s3:ListObjectsV2",<br>  "s3:ListBucketMultipartUploads",<br>  "s3:PutObject",<br>  "s3:PutObjectTagging",<br>  "s3:HeadBucket",<br>  "s3:DeleteObject"<br>]</pre> | no |
+| bucket\_name | Name of S3 bucket to create. | `string` | n/a | yes |
 | additional\_tags | Additional tags to be attached to the S3 bucket. | `map(string)` | `{}` | no |
+| read\_only\_actions | List of actions that should be permitted by a read-only policy. | `list(string)` | <pre>[<br>  "s3:Get*",<br>  "s3:List*"<br>]</pre> | no |
+| read\_only\_paths | List of bucket paths that should be attached to a read-only policy. | `list(string)` | `[]` | no |
+| read\_write\_actions | List of actions that should be permitted by a read-write policy. | `list(string)` | <pre>[<br>  "s3:GetBucketLocation",<br>  "s3:GetBucketCORS",<br>  "s3:GetObjectVersionForReplication",<br>  "s3:GetObject",<br>  "s3:GetBucketTagging",<br>  "s3:GetObjectVersion",<br>  "s3:GetObjectTagging",<br>  "s3:ListMultipartUploadParts",<br>  "s3:ListBucketByTags",<br>  "s3:ListBucket",<br>  "s3:ListObjects",<br>  "s3:ListObjectsV2",<br>  "s3:ListBucketMultipartUploads",<br>  "s3:PutObject",<br>  "s3:PutObjectTagging",<br>  "s3:HeadBucket",<br>  "s3:DeleteObject"<br>]</pre> | no |
+| read\_write\_paths | List of bucket paths that should be attached to a read-write policy. | `list(string)` | `[]` | no |
 
 ## Outputs
 
@@ -57,6 +56,7 @@ This modules creates:
 | bucket\_name | Name of S3 bucket created by encrypted-bucket module. |
 | ro\_policy\_arn | ARN assigned to read-only IAM policy created by iam-policy module. |
 | rw\_policy\_arn | ARN assigned to read-write IAM policy created by iam-policy module. |
+
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 # References
