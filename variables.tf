@@ -26,9 +26,7 @@ variable "read_only_actions" {
   type        = list(string)
   default = [
     "s3:Get*",
-    "s3:List*",
-    "s3:PutObject",
-    "s3:PutObjectTagging"
+    "s3:List*"
   ]
 }
 
