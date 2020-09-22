@@ -1,5 +1,5 @@
 output "ro_policy_arn" {
-  value       = aws_iam_policy.ro_policy.arn
+  value       = length(local.ro_paths) > 0 ? aws_iam_policy.ro_policy[0].arn : ""
   description = "ARN assigned to read-only IAM policy."
 }
 

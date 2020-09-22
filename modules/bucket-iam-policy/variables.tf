@@ -4,13 +4,13 @@ variable "bucket_name" {
 }
 
 variable "read_only_paths" {
-  description = "List of bucket paths that should be attached to a read-only policy."
+  description = "List of paths/prefixes that should be attached to a read-only policy. Listed path(s) should omit the head bucket."
   type        = list(string)
   default     = []
 }
 
 variable "read_write_paths" {
-  description = "List of bucket paths that should be attached to a read-write policy."
+  description = "List of paths/prefixes that should be attached to a read-write` policy. Listed path(s) should omit the head bucket."
   type        = list(string)
   default     = []
 }
