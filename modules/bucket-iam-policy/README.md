@@ -7,14 +7,20 @@ This terraform module creates read-only and/or read-write IAM policies that cove
 module "s3-iam-policy-eg" {
   source = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/bucket-iam-policy?ref=0.1.0"
   bucket_name = "mybucket"
-  read_only_paths   = ["mybucket/path/to/ro-folder"]
-  read_write_paths  = ["mybucket/path/to/rw-folder", "mybucket/path/to/another-rw-folder"]
+  read_only_paths   = ["path/to/ro-folder"]
+  read_write_paths  = ["path/to/rw-folder", "path/to/another-rw-folder"]
 }
 ```
 
+## Minimal
+Smallest complete fully working example. This example might require extra resources to run the example.
+- [Minimal](https://github.com/Datatamer/terraform-aws-s3/tree/master/examples/iam-policy-submodule)
+
 # Resources Created
 This modules creates:
-* a null resource
+* read-only and/or read-write IAM policies
+  * IAM policies created by this module are intended to be attached to _service roles_ downstream. S3-related permissions intended for an instance profile should be configured entirely downstream.
+  * If neither `read_only_paths` nor `read_write_paths` are provided, the module will default to creating a read-only IAM policy on the entire bucket
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

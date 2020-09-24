@@ -7,12 +7,12 @@ This terraform module creates an encrypted S3 bucket and any associated IAM poli
 module "tamr-s3-eg" {
   source            = "git::https://github.com/Datatamer/terraform-aws-s3?ref=0.1.0"
   bucket_name       = "mybucket"
-  read_only_paths   = ["mybucket/path/to/ro-folder"]
-  read_write_paths  = ["mybucket/path/to/rw-folder", "mybucket/path/to/another-rw-folder"]
+  read_only_paths   = ["path/to/ro-folder"]
+  read_write_paths  = ["path/to/rw-folder", "path/to/another-rw-folder"]
 }
 ```
-**Note about`read_only_paths` and `read_write_paths`:**
-* Providing a path to a folder like in the example, `"mybucket/path/to/folder"` permits the actions specified in `read_only_actions`/`read_write_actions` on **`["mybucket/pack/to/folder", "mybucket/path/to/folder/*"]`**.
+**Note about`read_only_paths`/`read_write_paths`:**
+* Providing a path to a folder like in the example, `[path/to/folder]` permits actions (specified in `read_only_actions`/`read_write_actions`) on `mybucket/path/to/folder` and `mybucket/path/to/folder/*`.
 
 ## Minimal
 Smallest complete fully working example. This example might require extra resources to run the example.
@@ -24,7 +24,7 @@ This modules creates:
 * a s3 bucket policy to enforce AES256 server-side-encryption
 * read-only and/or read-write IAM policies
   * IAM policies created by this module are intended to be attached to _service roles_ downstream. S3-related permissions intended for an instance profile should be configured entirely downstream.
-  * **NOTE**: If neither `read_only_paths` nor `read_write_paths` are provided, the module will default to creating a read-only IAM policy on the entire bucket
+  * If neither `read_only_paths` nor `read_write_paths` are provided, the module will default to creating a read-only IAM policy on the entire bucket
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

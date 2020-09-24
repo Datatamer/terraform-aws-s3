@@ -52,6 +52,7 @@ resource "aws_iam_policy" "ro_policy" {
   count = length(local.ro_paths) == 0 ? 0 : 1
 
   name   = "${var.bucket_name}-read-only"
+  # If you want read-only access to the entire bucket, path_specific_ro_doc should not overwrite ReadOnlyPolicy0 in ro_source_policy_doc
   policy = local.ro_paths[0] == "" ? data.aws_iam_policy_document.ro_source_policy_doc[0].json : data.aws_iam_policy_document.path_specific_ro_doc[0].json
 }
 
