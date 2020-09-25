@@ -12,11 +12,15 @@ module "tamr-s3-eg" {
 }
 ```
 **Note about`read_only_paths`/`read_write_paths`:**
-* Providing a path to a folder like in the example, `[path/to/folder]` permits actions (specified in `read_only_actions`/`read_write_actions`) on `mybucket/path/to/folder` and `mybucket/path/to/folder/*`.
+* Providing a path to a folder like in the example, `["path/to/folder"]` permits actions (specified in `read_only_actions`/`read_write_actions`) on `mybucket/path/to/folder` and `mybucket/path/to/folder/*`.
 
 ## Minimal
 Smallest complete fully working example. This example might require extra resources to run the example.
 - [Minimal](https://github.com/Datatamer/terraform-aws-s3/tree/master/examples/minimal)
+
+## S3 Bucket IAM Policy Submodule
+Working example of using [bucket-iam-policy submodule](https://github.com/Datatamer/terraform-aws-s3/tree/master/modules/bucket-iam-policy) on an existing S3 bucket
+- [S3 IAM Policy Example](https://github.com/Datatamer/terraform-aws-s3/tree/master/examples/iam-policy-submodule)
 
 # Resources Created
 This modules creates:
@@ -25,6 +29,7 @@ This modules creates:
 * read-only and/or read-write IAM policies
   * IAM policies created by this module are intended to be attached to _service roles_ downstream. S3-related permissions intended for an instance profile should be configured entirely downstream.
   * If neither `read_only_paths` nor `read_write_paths` are provided, the module will default to creating a read-only IAM policy on the entire bucket
+  * If you set `read_write_paths` to `[""]`, the module will permit `read_write_actions` on the whole bucket
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

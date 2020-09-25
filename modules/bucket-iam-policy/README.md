@@ -21,6 +21,7 @@ This modules creates:
 * read-only and/or read-write IAM policies
   * IAM policies created by this module are intended to be attached to _service roles_ downstream. S3-related permissions intended for an instance profile should be configured entirely downstream.
   * If neither `read_only_paths` nor `read_write_paths` are provided, the module will default to creating a read-only IAM policy on the entire bucket
+  * If you set `read_write_paths` to `[""]`, the module will permit `read_write_actions` on the whole bucket
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
