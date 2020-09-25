@@ -1,9 +1,14 @@
-output "null_resource_id" {
-  value       = "${null_resource.foo.id}"
-  description = "An arbitrary value that changes each time the resource is replaced."
+output "bucket_name" {
+  value       = module.encrypted-bucket.bucket_name
+  description = "Name of S3 bucket created by encrypted-bucket module."
 }
 
-output "example_value" {
-  value       = "${var.example}"
-  description = "Example variable."
+output "ro_policy_arn" {
+  value       = module.bucket-iam-policy.ro_policy_arn
+  description = "ARN assigned to read-only IAM policy created by iam-policy module."
+}
+
+output "rw_policy_arn" {
+  value       = module.bucket-iam-policy.rw_policy_arn
+  description = "ARN assigned to read-write IAM policy created by iam-policy module."
 }

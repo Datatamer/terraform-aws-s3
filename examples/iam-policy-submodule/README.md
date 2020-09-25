@@ -5,13 +5,15 @@ No requirements.
 
 ## Providers
 
-No provider.
+| Name | Version |
+|------|---------|
+| aws | n/a |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| test\_bucket\_name | Name of test S3 bucket name. | `string` | n/a | yes |
+| existing\_bucket\_name | Name of existing S3 bucket to create policies for. | `string` | n/a | yes |
 
 ## Outputs
 
