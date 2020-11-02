@@ -36,6 +36,7 @@ This modules creates:
 | Name | Version |
 |------|---------|
 | aws | >= 2.45.0 |
+| random | n/a |
 
 ## Inputs
 

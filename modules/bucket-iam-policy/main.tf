@@ -47,11 +47,17 @@ data "aws_iam_policy_document" "path_specific_ro_doc" {
   }
 }
 
+# Appended to policy name to allow creation of multiple policies on the same bucket.
+resource "random_string" "rand" {
+  length  = 6
+  special = false
+}
+
 # Read-only IAM policy
 resource "aws_iam_policy" "ro_policy" {
   count = length(local.ro_paths) == 0 ? 0 : 1
 
-  name = "${var.bucket_name}-read-only"
+  name = format("%s-read-only-%s", var.bucket_name, random_string.rand.result)
   # If you want read-only access to the entire bucket, path_specific_ro_doc should not overwrite ReadOnlyPolicy0 in ro_source_policy_doc
   policy = local.ro_paths[0] == "" ? data.aws_iam_policy_document.ro_source_policy_doc[0].json : data.aws_iam_policy_document.path_specific_ro_doc[0].json
 }
@@ -101,7 +107,7 @@ data "aws_iam_policy_document" "path_specific_rw_doc" {
 resource "aws_iam_policy" "rw_policy" {
   count = length(var.read_write_paths) == 0 ? 0 : 1
 
-  name = "${var.bucket_name}-read-write"
+  name = format("%s-read-write-%s", var.bucket_name, random_string.rand.result)
   # If you want read-write access to the entire bucket, path_specific_rw_doc should not overwrite ReadWritePolicy0 in rw_source_policy_doc
   policy = var.read_write_paths[0] == "" ? data.aws_iam_policy_document.rw_source_policy_doc[0].json : data.aws_iam_policy_document.path_specific_rw_doc[0].json
 }

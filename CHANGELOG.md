@@ -1,2 +1,8 @@
-# Tamr Terraform Template Repo - v0.1.0 - Feb 25th 2020
+# Tamr S3 Module Repo
+
+## v0.1.0 - Sep 25th 2020
 * Initing project
+
+## v0.1.1 - Nov 2nd 2020
+* Allows creation of multiple IAM policies on the same bucket
+* Adds outputs to examples

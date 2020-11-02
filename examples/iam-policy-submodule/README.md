@@ -17,6 +17,9 @@ No requirements.
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| iam-policy-0 | n/a |
+| iam-policy-1 | n/a |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
