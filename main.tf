@@ -2,6 +2,7 @@ module "encrypted-bucket" {
   source          = "./modules/encrypted-bucket"
   bucket_name     = var.bucket_name
   additional_tags = var.additional_tags
+  force_destroy   = var.force_destroy
 }
 
 module "bucket-iam-policy" {

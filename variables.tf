@@ -9,6 +9,15 @@ variable "additional_tags" {
   default     = {}
 }
 
+variable "force_destroy" {
+  type        = bool
+  description = <<EOF
+  A boolean that indicates all objects (including any locked objects) should be deleted from the
+  bucket so that the bucket can be destroyed without error. These objects are not recoverable.
+  EOF
+  default     = true
+}
+
 variable "read_only_paths" {
   description = "List of paths/prefixes that should be attached to a read-only policy. Listed path(s) should omit the head bucket."
   type        = list(string)
