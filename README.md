@@ -5,7 +5,7 @@ This terraform module creates an encrypted S3 bucket and any associated IAM poli
 ## Basic
 ```
 module "tamr-s3-eg" {
-  source            = "git::https://github.com/Datatamer/terraform-aws-s3?ref=0.1.0"
+  source            = "git::https://github.com/Datatamer/terraform-aws-s3?ref=0.1.2"
   bucket_name       = "mybucket"
   read_only_paths   = ["path/to/ro-folder"]
   read_write_paths  = ["path/to/rw-folder", "path/to/another-rw-folder"]
@@ -49,6 +49,7 @@ No provider.
 |------|-------------|------|---------|:--------:|
 | bucket\_name | Name of S3 bucket to create. | `string` | n/a | yes |
 | additional\_tags | Additional tags to be attached to the S3 bucket. | `map(string)` | `{}` | no |
+| force\_destroy | A boolean that indicates all objects (including any locked objects) should be deleted from the<br>  bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `true` | no |
 | read\_only\_actions | List of actions that should be permitted by a read-only policy. | `list(string)` | <pre>[<br>  "s3:Get*",<br>  "s3:List*"<br>]</pre> | no |
 | read\_only\_paths | List of paths/prefixes that should be attached to a read-only policy. Listed path(s) should omit the head bucket. | `list(string)` | `[]` | no |
 | read\_write\_actions | List of actions that should be permitted by a read-write policy. | `list(string)` | <pre>[<br>  "s3:GetBucketLocation",<br>  "s3:GetBucketCORS",<br>  "s3:GetObjectVersionForReplication",<br>  "s3:GetObject",<br>  "s3:GetBucketTagging",<br>  "s3:GetObjectVersion",<br>  "s3:GetObjectTagging",<br>  "s3:ListMultipartUploadParts",<br>  "s3:ListBucketByTags",<br>  "s3:ListBucket",<br>  "s3:ListObjects",<br>  "s3:ListObjectsV2",<br>  "s3:ListBucketMultipartUploads",<br>  "s3:PutObject",<br>  "s3:PutObjectTagging",<br>  "s3:HeadBucket",<br>  "s3:DeleteObject"<br>]</pre> | no |

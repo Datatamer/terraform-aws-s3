@@ -8,3 +8,12 @@ variable "additional_tags" {
   description = "Additional tags to be attached to the S3 bucket."
   default     = {}
 }
+
+variable "force_destroy" {
+  type        = bool
+  description = <<EOF
+  A boolean that indicates all objects (including any locked objects) should be deleted from the
+  bucket so that the bucket can be destroyed without error. These objects are not recoverable.
+  EOF
+  default     = true
+}

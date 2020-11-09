@@ -5,7 +5,7 @@ This terraform module creates a server-side encrypted S3 bucket with a bucket po
 ## Basic
 ```
 module "encrypted-s3-eg" {
-  source        = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/encrypted-bucket?ref=0.1.0"
+  source        = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/encrypted-bucket?ref=0.1.2"
   bucket_name   = "mybucket"
 }
 ```
@@ -38,6 +38,7 @@ This modules creates:
 |------|-------------|------|---------|:--------:|
 | bucket\_name | Name of S3 bucket to create. | `string` | n/a | yes |
 | additional\_tags | Additional tags to be attached to the S3 bucket. | `map(string)` | `{}` | no |
+| force\_destroy | A boolean that indicates all objects (including any locked objects) should be deleted from the<br>  bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `true` | no |
 
 ## Outputs
 
