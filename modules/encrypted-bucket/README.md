@@ -5,7 +5,7 @@ This terraform module creates a server-side encrypted S3 bucket with a bucket po
 ## Basic
 ```
 module "encrypted-s3-eg" {
-  source        = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/encrypted-bucket?ref=0.1.2"
+  source        = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/encrypted-bucket?ref=0.1.3"
   bucket_name   = "mybucket"
 }
 ```
