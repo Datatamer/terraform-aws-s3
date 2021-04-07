@@ -5,7 +5,7 @@ This terraform module creates read-only and/or read-write IAM policies that cove
 ## Basic
 ```
 module "s3-iam-policy-eg" {
-  source = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/bucket-iam-policy?ref=0.1.3"
+  source = "git::https://github.com/Datatamer/terraform-aws-s3.git//modules/bucket-iam-policy?ref=0.2.0"
   bucket_name = "mybucket"
   read_only_paths   = ["path/to/ro-folder"]
   read_write_paths  = ["path/to/rw-folder", "path/to/another-rw-folder"]
