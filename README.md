@@ -49,6 +49,7 @@ No provider.
 |------|-------------|------|---------|:--------:|
 | bucket\_name | Name of S3 bucket to create. | `string` | n/a | yes |
 | additional\_tags | Additional tags to be attached to the S3 bucket. | `map(string)` | `{}` | no |
+| arn\_partition | The partition in which the resource is located. A partition is a group of AWS Regions.<br>  Each AWS account is scoped to one partition.<br>  The following are the supported partitions:<br>    aws -AWS Regions<br>    aws-cn - China Regions<br>    aws-us-gov - AWS GovCloud (US) Regions | `string` | `"aws"` | no |
 | force\_destroy | A boolean that indicates all objects (including any locked objects) should be deleted from the<br>  bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `true` | no |
 | read\_only\_actions | List of actions that should be permitted by a read-only policy. | `list(string)` | <pre>[<br>  "s3:Get*",<br>  "s3:List*"<br>]</pre> | no |
 | read\_only\_paths | List of paths/prefixes that should be attached to a read-only policy. Listed path(s) should omit the head bucket. | `list(string)` | `[]` | no |
