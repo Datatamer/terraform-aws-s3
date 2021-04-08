@@ -17,8 +17,8 @@ data "aws_iam_policy_document" "ro_source_policy_doc" {
     effect  = "Allow"
     actions = var.read_only_actions
     resources = [
-      "arn:aws:s3:::${var.bucket_name}",
-      "arn:aws:s3:::${var.bucket_name}/*"
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}",
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}/*"
     ]
   }
 }
@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "path_specific_ro_doc" {
       effect  = "Allow"
       actions = var.read_only_actions
       resources = [
-        "arn:aws:s3:::${var.bucket_name}/${statement.value}",
-        "arn:aws:s3:::${var.bucket_name}/${statement.value}/*"
+        "arn:${var.arn_partition}:s3:::${var.bucket_name}/${statement.value}",
+        "arn:${var.arn_partition}:s3:::${var.bucket_name}/${statement.value}/*"
       ]
     }
   }
@@ -73,8 +73,8 @@ data "aws_iam_policy_document" "rw_source_policy_doc" {
     effect  = "Allow"
     actions = var.read_write_actions
     resources = [
-      "arn:aws:s3:::${var.bucket_name}",
-      "arn:aws:s3:::${var.bucket_name}/*"
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}",
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}/*"
     ]
   }
 }
@@ -96,8 +96,8 @@ data "aws_iam_policy_document" "path_specific_rw_doc" {
       effect  = "Allow"
       actions = var.read_write_actions
       resources = [
-        "arn:aws:s3:::${var.bucket_name}/${statement.value}",
-        "arn:aws:s3:::${var.bucket_name}/${statement.value}/*"
+        "arn:${var.arn_partition}:s3:::${var.bucket_name}/${statement.value}",
+        "arn:${var.arn_partition}:s3:::${var.bucket_name}/${statement.value}/*"
       ]
     }
   }

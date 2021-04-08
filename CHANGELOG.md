@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v0.2.0 - April 7th 2021
+*  Adds new variable `arn_partition` to set the partition of any ARNs referenced in this module
+
 ## v0.1.3 - Nov 17th 2020
 * Fixes for issues with the outputs.tf when a resource does not exist
 
