@@ -5,13 +5,13 @@ pipeline {
                  args '--entrypoint='
                  }
     }
-    environment {
-        // this slows down the process but makes it available to all stages so I can use it in the message. Move it to the plan stage in order to speed it up but it'll break the message 
-                OUT = """${sh(
-                        returnStdout: true,
-                        script: 'terraform plan'
-                    )}""" 
-    }
+    // environment {
+    //     // this slows down the process but makes it available to all stages so I can use it in the message. Move it to the plan stage in order to speed it up but it'll break the message 
+    //             OUT = """${sh(
+    //                     returnStdout: true,
+    //                     script: 'terraform plan'
+    //                 )}""" 
+    // }
     stages {
         stage('test') {
             steps {
