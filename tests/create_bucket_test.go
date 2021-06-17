@@ -21,10 +21,11 @@ func TestTerraformS3CreateUnencryptedBucket(t *testing.T) {
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// The path to where our Terraform code is located
-		TerraformDir: "../examples/minimal",
+		TerraformDir: "../examples/test_minimal",
 
 		Vars: map[string]interface{}{
 			"test_bucket_name": expectedName,
+			"aws_region":       awsRegion,
 			// "tag_bucket_environment": expectedEnvironment,
 			// "with_policy": "true",
 		},
