@@ -15,8 +15,7 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                sh 'cd tests'
-                sh 'go test -v'
+                sh 'cd tests && go test -v'
             }
         }
         stage('validate') {
