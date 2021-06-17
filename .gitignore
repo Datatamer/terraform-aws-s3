@@ -1,6 +1,8 @@
 # Local .terraform directories
 **/.terraform/*
 
+*.terraform.d/*
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -40,3 +42,7 @@ ops-makefile
 
 # VisualStudioCode
 .vscode/
+
+.cache/
+
+.bash_history
