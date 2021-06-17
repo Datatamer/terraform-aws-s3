@@ -15,7 +15,8 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                sh 'cd tests && GOCACHE=off go test -v'
+                sh 'whoami'
+                sh 'cd tests && XDG_CACHE_HOME=/tmp/.cache go test -v'
             }
         }
         stage('validate') {
