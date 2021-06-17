@@ -37,3 +37,6 @@ terratest.tf.json
 
 # Ignore makefile
 ops-makefile
+
+# VisualStudioCode
+.vscode/
