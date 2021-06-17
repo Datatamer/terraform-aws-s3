@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'hashicorp/terraform:0.15.5'
+        docker { image 'hugomrbr/go-terraform-aws:0.0.1'
                  label 'docker'
                  args '--entrypoint='
                  }
@@ -15,8 +15,8 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                sh 'ls -la'
-                sh 'echo "here come the terratest tests"'
+                sh 'cd tests'
+                sh 'go test -v'
             }
         }
         stage('validate') {
