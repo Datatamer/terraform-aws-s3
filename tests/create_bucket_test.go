@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -46,11 +48,37 @@ func TestTerraformS3CreateUnencryptedBucket(t *testing.T) {
 		logger.Log(t, err)
 	}
 
-	assert.Equal(t, expectedName, b["bucket_name"].(string))
-	// aws.AssertS3BucketPolicyExists(t, awsRegion, b["bucket_name"].(string))
+	bucket_name := b["bucket_name"].(string)
+	assert.Equal(t, expectedName, bucket_name)
+	aws.AssertS3BucketPolicyExists(t, awsRegion, bucket_name)
+
+	bodyString := "test-body"
+	k := fmt.Sprintf("example-file-%s", strings.ToLower(random.UniqueId()))
+	upParams := &s3manager.UploadInput{
+		Bucket: &bucket_name,
+		Key:    &k,
+		Body:   strings.NewReader(bodyString),
+	}
+
+	up := aws.NewS3Uploader(t, awsRegion)
+
+	_, err = up.Upload(upParams)
+	assert.Error(t, err)
+
+	// encrypted
+	k = fmt.Sprintf("example-enc-file-%s", strings.ToLower(random.UniqueId()))
+	e := "AES256"
+	upParams = &s3manager.UploadInput{
+		Bucket:               &bucket_name,
+		Key:                  &k,
+		Body:                 strings.NewReader(bodyString),
+		ServerSideEncryption: &e,
+	}
+	up = aws.NewS3Uploader(t, awsRegion)
+
+	_, err = up.Upload(upParams)
+
+	time.Sleep(3 * time.Second)
+	assert.Equal(t, aws.GetS3ObjectContents(t, awsRegion, bucket_name, k), bodyString)
 
 }
-
-/*
-map[bucket_name:terratest-aws-s3-example-a5qoov ro_policy_arn:arn:aws:iam::131578276461:policy/terratest-aws-s3-example-a5qoov-read-only-J4XMR5 rw_policy_arn:arn:aws:iam::131578276461:policy/terratest-aws-s3-example-a5qoov-read-write-J4XMR5]
-*/
