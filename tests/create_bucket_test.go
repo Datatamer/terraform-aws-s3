@@ -10,6 +10,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
@@ -78,7 +79,9 @@ func TestTerraformS3CreateUnencryptedBucket(t *testing.T) {
 
 	_, err = up.Upload(upParams)
 
-	time.Sleep(3 * time.Second)
-	assert.Equal(t, aws.GetS3ObjectContents(t, awsRegion, bucket_name, k), bodyString)
+	objContent := retry.DoWithRetry(t, "desc", 5, 3*time.Second, func() (string, error) {
+		return aws.GetS3ObjectContentsE(t, awsRegion, bucket_name, k)
+	})
 
+	assert.Equal(t, bodyString, objContent)
 }
