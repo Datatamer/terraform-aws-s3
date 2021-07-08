@@ -1,6 +1,6 @@
 # Tamr S3 Module Repo
 
-## v1.1.0 - April 12th 2021
+## v1.1.0 - July 8th 2021
 * Sets default value for `additional_tags`
 * Adds tags for IAM policies
 
