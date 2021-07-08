@@ -1,5 +1,9 @@
 # Tamr S3 Module Repo
 
+## v1.1.0 - April 12th 2021
+* Sets default value for `additional_tags`
+* Adds tags for IAM policies
+
 ## v1.0.0 - April 12th 2021
 * Updates minimum Terraform version to 13
 * Updates minimum AWS provider version to 3.36.0
