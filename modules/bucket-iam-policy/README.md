@@ -43,6 +43,7 @@ This modules creates:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | bucket\_name | Name of S3 bucket resource that IAM policies will be created for. | `string` | n/a | yes |
+| additional\_tags | Additional tags to be attached to the IAM policies. | `map(string)` | `{}` | no |
 | arn\_partition | The partition in which the resource is located. A partition is a group of AWS Regions.<br>  Each AWS account is scoped to one partition.<br>  The following are the supported partitions:<br>    aws -AWS Regions<br>    aws-cn - China Regions<br>    aws-us-gov - AWS GovCloud (US) Regions | `string` | `"aws"` | no |
 | read\_only\_actions | List of actions that should be permitted by a read-only policy. | `list(string)` | <pre>[<br>  "s3:Get*",<br>  "s3:List*"<br>]</pre> | no |
 | read\_only\_paths | List of paths/prefixes that should be attached to a read-only policy. Listed path(s) should omit the head bucket. | `list(string)` | `[]` | no |
