@@ -60,3 +60,9 @@ variable "arn_partition" {
   EOF
   default     = "aws"
 }
+
+variable "additional_tags" {
+  type        = map(string)
+  description = "Additional tags to be attached to the IAM policies."
+  default     = {}
+}

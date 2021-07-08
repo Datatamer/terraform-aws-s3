@@ -6,7 +6,7 @@ variable "bucket_name" {
 variable "additional_tags" {
   type        = map(string)
   description = "Additional tags to be attached to the S3 bucket."
-  default     = {}
+  default     = { Author : "Tamr" }
 }
 
 variable "force_destroy" {
