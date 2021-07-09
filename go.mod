@@ -1,4 +1,4 @@
-module github.com/caylent/tamr-terraform-aws-s3
+module github.com/Datatamer/tamr-terraform-aws-s3
 
 go 1.13
 
