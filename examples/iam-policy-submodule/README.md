@@ -14,6 +14,7 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | existing\_bucket\_name | Name of existing S3 bucket to create policies for. | `string` | n/a | yes |
+| additional\_tags | Additional tags for resources created by this example | `map(string)` | <pre>{<br>  "Author": "Tamr",<br>  "Environment": "Example"<br>}</pre> | no |
 
 ## Outputs
 
