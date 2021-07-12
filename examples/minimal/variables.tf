@@ -5,9 +5,9 @@ variable "test_bucket_name" {
 
 variable "tags" {
   type        = map(string)
-  description = "Additional tags for resources created by this example"
-  default     = { 
-    Author = "Tamr"
+  description = "A map of tags to add to all resources created by this example."
+  default = {
+    Author      = "Tamr"
     Environment = "Example"
   }
 }
