@@ -60,7 +60,7 @@ resource "aws_iam_policy" "ro_policy" {
   name = format("%s-read-only-%s", var.bucket_name, random_string.rand.result)
   # If you want read-only access to the entire bucket, path_specific_ro_doc should not overwrite ReadOnlyPolicy0 in ro_source_policy_doc
   policy = local.ro_paths[0] == "" ? data.aws_iam_policy_document.ro_source_policy_doc[0].json : data.aws_iam_policy_document.path_specific_ro_doc[0].json
-  tags = var.additional_tags
+  tags = var.tags
 }
 
 # Policy document for read-write access to entire bucket (bucket, bucket/*)
@@ -111,5 +111,5 @@ resource "aws_iam_policy" "rw_policy" {
   name = format("%s-read-write-%s", var.bucket_name, random_string.rand.result)
   # If you want read-write access to the entire bucket, path_specific_rw_doc should not overwrite ReadWritePolicy0 in rw_source_policy_doc
   policy = var.read_write_paths[0] == "" ? data.aws_iam_policy_document.rw_source_policy_doc[0].json : data.aws_iam_policy_document.path_specific_rw_doc[0].json
-  tags = var.additional_tags
+  tags = var.tags
 }

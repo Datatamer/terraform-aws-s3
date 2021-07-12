@@ -9,6 +9,12 @@ variable "additional_tags" {
   default     = {}
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "Additional tags to be attached to the S3 bucket."
+  default     = {}
+}
+
 variable "force_destroy" {
   type        = bool
   description = <<EOF

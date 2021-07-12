@@ -61,7 +61,7 @@ variable "arn_partition" {
   default     = "aws"
 }
 
-variable "additional_tags" {
+variable "tags" {
   type        = map(string)
   description = "Additional tags to be attached to the IAM policies."
   default     = {}
