@@ -5,7 +5,7 @@ variable "bucket_name" {
 
 variable "tags" {
   type        = map(string)
-  description = "Additional tags to be attached to the S3 bucket and IAM policies."
+  description = "A map of tags to add to all resources."
   default     = {}
 }
 
