@@ -1,6 +1,6 @@
 # Tamr S3 Module Repo
 
-## v1.1.0 - July 12th 2021
+## v1.1.0 - July 12nd 2021
 * Adds tags for IAM policies
 * Adds new variable `tags` to set tags for all resources
 * Deprecates `additional_tags` in favor of `tags`
