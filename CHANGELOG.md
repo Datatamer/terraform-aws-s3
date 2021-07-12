@@ -1,7 +1,9 @@
 # Tamr S3 Module Repo
 
-## v1.1.0 - July 9th 2021
+## v1.1.0 - July 12th 2021
 * Adds tags for IAM policies
+* Adds new variable `tags` to set tags for all resources
+* Deprecates `additional_tags` in favor of `tags`
 
 ## v1.0.0 - April 12th 2021
 * Updates minimum Terraform version to 13
