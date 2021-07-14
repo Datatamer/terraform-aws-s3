@@ -3,11 +3,11 @@ locals {
 }
 
 module "encrypted-bucket" {
-  source          = "./modules/encrypted-bucket"
-  bucket_name     = var.bucket_name
-  force_destroy   = var.force_destroy
-  arn_partition   = var.arn_partition
-  tags            = local.effective_tags
+  source        = "./modules/encrypted-bucket"
+  bucket_name   = var.bucket_name
+  force_destroy = var.force_destroy
+  arn_partition = var.arn_partition
+  tags          = local.effective_tags
 }
 
 module "bucket-iam-policy" {
