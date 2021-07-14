@@ -8,6 +8,7 @@ module "existing-bucket-iam-0" {
   source           = "../../modules/bucket-iam-policy"
   bucket_name      = data.aws_s3_bucket.existing-bucket.id
   read_write_paths = ["some/read-write-folder"]
+  tags             = var.tags
 }
 
 module "existing-bucket-iam-1" {
@@ -15,4 +16,5 @@ module "existing-bucket-iam-1" {
   source           = "../../modules/bucket-iam-policy"
   bucket_name      = data.aws_s3_bucket.existing-bucket.id
   read_write_paths = ["another/read-write-folder"]
+  tags             = var.tags
 }

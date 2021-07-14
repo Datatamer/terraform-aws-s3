@@ -11,7 +11,7 @@ resource "aws_s3_bucket" "new_bucket" { #tfsec:ignore:AWS002
   }
 
   force_destroy = var.force_destroy
-  tags          = var.additional_tags
+  tags          = var.tags
 }
 
 # Bucket policy to enforce AES256 server-side-encryption
