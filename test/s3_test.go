@@ -39,13 +39,13 @@ func TestTerraformS3Bucket(t *testing.T) {
 
 	terraform.InitAndApply(t, terraformOptions)
 
-	b, err := terraform.OutputMapOfObjectsE(t, terraformOptions, "test-bucket")
+	bucketMap, err := terraform.OutputMapOfObjectsE(t, terraformOptions, "test-bucket")
 
 	if err != nil {
 		logger.Log(t, err)
 	}
 
-	bucket_name := b["bucket_name"].(string)
+	bucket_name := bucketMap["bucket_name"].(string)
 
 	assert.Equal(t, expectedName, bucket_name)
 	aws.AssertS3BucketPolicyExists(t, awsRegion, bucket_name)
@@ -77,7 +77,10 @@ func TestTerraformS3Bucket(t *testing.T) {
 
 	_, err = up.Upload(upParams)
 
-	objContent := retry.DoWithRetry(t, "desc", 5, 3*time.Second, func() (string, error) {
+	if err != nil {
+		assert.FailNow(t, "Upload failed: %s", err)
+	}
+	objContent := retry.DoWithRetry(t, "Waiting S3 Object to be uploaded and available", 5, 3*time.Second, func() (string, error) {
 		return aws.GetS3ObjectContentsE(t, awsRegion, bucket_name, k)
 	})
 
