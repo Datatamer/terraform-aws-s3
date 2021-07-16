@@ -1,6 +1,8 @@
 # Local .terraform directories
 **/.terraform/*
 
+*.terraform.d/*
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -37,3 +39,10 @@ terratest.tf.json
 
 # Ignore makefile
 ops-makefile
+
+# VisualStudioCode
+.vscode/
+
+.cache/
+
+.bash_history
