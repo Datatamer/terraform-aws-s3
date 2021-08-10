@@ -3,6 +3,9 @@
 
 *.terraform.d/*
 
+# Terraform modules lock file
+*.terraform.lock.hcl
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
