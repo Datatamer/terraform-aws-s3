@@ -42,7 +42,3 @@ ops-makefile
 
 # VisualStudioCode
 .vscode/
-
-.cache/
-
-.bash_history
