@@ -32,6 +32,7 @@ override.tf.json
 
 # Ignore terratest configuration
 terratest.tf.json
+**/.test-data/*
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
