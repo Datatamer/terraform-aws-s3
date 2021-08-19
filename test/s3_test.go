@@ -132,9 +132,9 @@ func TestTerraformS3Bucket(t *testing.T) {
 		t.Run(testCase.testName, func(t *testing.T) {
 			t.Parallel()
 
-			// This is terrible - but attempt to stagger the test cases to
+			// This is ugly - but attempt to stagger the test cases to
 			// avoid a concurrency issue
-			time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
+			// time.Sleep(time.Duration(testCase.sleepDuration) * time.Second)
 
 			// this creates a tempTestFolder for each bucketTestCase
 			tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "test_examples/minimal")
@@ -146,7 +146,6 @@ func TestTerraformS3Bucket(t *testing.T) {
 			})
 
 			expectedBucketName := fmt.Sprintf("terratest-aws-s3-example-%s", strings.ToLower(random.UniqueId()))
-			// expectedBucketName = "terratest-aws-s3-example-qqr5xd"
 
 			test_structure.RunTestStage(t, "setup_options", func() {
 				terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
@@ -160,9 +159,7 @@ func TestTerraformS3Bucket(t *testing.T) {
 						"AWS_REGION": awsRegion,
 					},
 				})
-				// f, _ := os.Open(test_structure.FormatTestDataPath(tempTestFolder, "TerraformOptions.json"))
-				// bytearray, _ := ioutil.ReadAll(f)
-				// json.Unmarshal(bytearray, terraformOptions)
+
 				test_structure.SaveTerraformOptions(t, tempTestFolder, terraformOptions)
 			})
 
