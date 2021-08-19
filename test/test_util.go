@@ -12,12 +12,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/testing"
 )
 
-// func uploadObjectE(awsRegion string, bucketName string, key string, encryption string, bodyString string) error {
-
-// 	up := s3manager.NewUploader(sess)
-// 	return uploadObjectWithUploaderE(awsRegion, bucketName, key, encryption, bodyString, up)
-// }
-
 func uploadObjectWithUploaderE(awsRegion string, bucketName string, key string, encryption string, bodyString string, up *s3manager.Uploader) error {
 	var upInput *s3manager.UploadInput
 
