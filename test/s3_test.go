@@ -4,18 +4,13 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gruntwork-io/terratest/modules/aws"
-	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
-	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTerraformS3Bucket(t *testing.T) {
@@ -44,29 +39,15 @@ func TestTerraformS3Bucket(t *testing.T) {
 	// os.Setenv("SKIP_teardown_role", "true")
 
 	// string to be used as body for files to be created
-	testBodyString := "test"
-
-	// define struct for each object Test Case
-	type objectTestCase struct {
-		key             string
-		encryption      string
-		expectPassRead  bool
-		expectPassWrite bool
-	}
+	testBody := "test"
 
 	// list of different buckets that will be created to be tested
-	var bucketTestCases = []struct {
-		testName      string
-		pathRO        []string
-		pathRW        []string
-		objTestCases  []objectTestCase
-		sleepDuration int
-	}{
+	var bucketTestCases = []BucketTestCase{
 		{
 			"TestBucket1",
 			[]string{"path/to/ro-folder"},
 			[]string{"path/to/rw-folder"},
-			[]objectTestCase{
+			[]ObjectTestCase{
 				{
 					key:             "path/to/ro-folder/obj1",
 					encryption:      "AES256",
@@ -92,7 +73,7 @@ func TestTerraformS3Bucket(t *testing.T) {
 			"TestBucket2",
 			[]string{"other/path/to/ro-folder"},
 			[]string{"other/path/to/rw-folder"},
-			[]objectTestCase{
+			[]ObjectTestCase{
 				{
 					key: "path/to/ro-folder/obj1",
 					// encryption:      "",
@@ -177,20 +158,19 @@ func TestTerraformS3Bucket(t *testing.T) {
 				aws.AssertS3BucketPolicyExists(t, awsRegion, bucketName)
 			})
 
-			// in here we use Terratest (default AWS env or TERRATEST_IAM_ROLE envvar) user to create objects
-			// that should be tested in ReadOnly paths
-			// (in other words, we expect PutObject to fail for this object)
+			// in here we use Terratest user (default AWS env or TERRATEST_IAM_ROLE env var)
+			// to create objects that should be tested in ReadOnly paths of the policies
 			test_structure.RunTestStage(t, "create_ro_objects", func() {
 				for _, obj := range testCase.objTestCases {
 					obj := obj
-					// Creates object with default AWS session that presumably has PutObject permission
-					// If encryption isn't set, trying to upload with default AWS session would fail as well
-					if !obj.expectPassWrite && obj.encryption != "" {
-						logger.Log(t, fmt.Sprintf("Default Credential: uploading object %s...", obj.key))
-						err := uploadObjectWithUploaderE(awsRegion, expectedBucketName, obj.key, obj.encryption, testBodyString, defaultUploader)
-						require.NoError(t, err, "Error raised when trying to upload objects that would be tested in ReadOnly paths")
-						logger.Log(t, fmt.Sprintf("Uploaded object %s with default credential", obj.key))
-					}
+					CondCreateObject(CondCreateObjectInput{
+						t,
+						awsRegion,
+						expectedBucketName,
+						testBody,
+						obj,
+						defaultUploader,
+					})
 				}
 			})
 
@@ -233,53 +213,31 @@ func TestTerraformS3Bucket(t *testing.T) {
 				bucketName := bucketMap["bucket_name"].(string)
 				assumeRoleARN := terraform.Output(t, roleTerraformOptions, "role_arn")
 
-				// try to sts:AssumeRole the Role we created earlier
-				assumedRoleSession, err := retry.DoWithRetryInterfaceE(t, "Trying to assume role...", 3, 5*time.Second, func() (interface{}, error) {
-					return aws.NewAuthenticatedSessionFromRole(awsRegion, assumeRoleARN)
+				assumedRoleSession := assumeRoleWithRetry(assumeRoleWithRetryInput{
+					t,
+					awsRegion,
+					assumeRoleARN,
 				})
-
-				// Fail test if sts:AssumeRole fails
-				require.NoError(t, err)
-				logger.Log(t, fmt.Sprintf("Assumed role %s successfully", assumeRoleARN))
-
-				// using the same Uploader object as it is safe to use them concurrently if needed.
-				uploaderRole := s3manager.NewUploader(assumedRoleSession.(*session.Session))
 
 				for _, obj := range testCase.objTestCases {
 					obj := obj
-					if obj.expectPassWrite {
-						// upload and require no error
-						logger.Log(t, fmt.Sprintf("Try to upload using role: %s", obj.key))
-						err := uploadObjectWithUploaderE(awsRegion, bucketName, obj.key, obj.encryption, testBodyString, uploaderRole)
-						require.NoError(t, err)
-						logger.Log(t, fmt.Sprintf("%s uploaded using role", obj.key))
-					} else {
-						// try to upload, require error
-						err := uploadObjectWithUploaderE(awsRegion, bucketName, obj.key, obj.encryption, testBodyString, uploaderRole)
-						require.Error(t, err)
-						logger.Log(t, fmt.Sprintf("%s could not be uploaded using role", obj.key))
-					}
 
-					if obj.expectPassRead {
-						// read and require no error
-						objContent, err := retry.DoWithRetryE(t, "Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
-							3, 5*time.Second,
-							func() (string, error) {
-								return GetS3ObjectContentsWithSessionE(t, awsRegion, bucketName, obj.key, assumedRoleSession.(*session.Session))
-							})
-						require.NoError(t, err)
-						assert.Equal(t, testBodyString, objContent)
-						logger.Log(t, fmt.Sprintf("%s was read using role", obj.key))
-					} else {
-						// try to read, require error
-						_, err := retry.DoWithRetryE(t, "Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
-							3, 5*time.Second,
-							func() (string, error) {
-								return GetS3ObjectContentsWithSessionE(t, awsRegion, bucketName, obj.key, assumedRoleSession.(*session.Session))
-							})
-						require.Error(t, err)
-						logger.Log(t, fmt.Sprintf("%s could not be read using role", obj.key))
-					}
+					validatePutObject(validatePutObjectInput{
+						t,
+						awsRegion,
+						bucketName,
+						obj,
+						testBody,
+						assumedRoleSession,
+					})
+
+					validateGetObject(validateGetObjectInput{
+						t,
+						bucketName,
+						obj,
+						testBody,
+						assumedRoleSession,
+					})
 				}
 			})
 		})
