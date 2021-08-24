@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "account-assume-role-policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["*"] // [format("arn:aws:iam::%s:root", data.aws_caller_identity.current.account_id)]
+      identifiers = [format("arn:aws:iam::%s:root", data.aws_caller_identity.current.account_id)]
     }
   }
 }
