@@ -76,19 +76,22 @@ func TestTerraformS3Bucket(t *testing.T) {
 			[]ObjectTestCase{
 				{
 					key: "path/to/ro-folder/obj1",
-					// encryption:      "",
+					// not setting encryption here to make sure we cannot upload unencrypted objects
+					encryption:      "",
 					expectPassRead:  false,
 					expectPassWrite: false,
 				},
 				{
 					key: "path/to/rw-folder/obj2",
-					// encryption:      "",
+					// not setting encryption here to make sure we cannot upload unencrypted objects
+					encryption:      "",
 					expectPassRead:  false,
 					expectPassWrite: false,
 				},
 				{
 					key: "other/rw-folder/obj3",
-					// encryption:      "",
+					// not setting encryption here to make sure we cannot upload unencrypted objects
+					encryption:      "",
 					expectPassRead:  false,
 					expectPassWrite: false,
 				},
