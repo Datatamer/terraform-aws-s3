@@ -27,11 +27,11 @@ type ObjectTestCase struct {
 
 // define struct for each bucket Test Case
 type BucketTestCase struct {
-	testName      string
-	pathRO        []string
-	pathRW        []string
-	objTestCases  []ObjectTestCase
-	sleepDuration int
+	testName         string
+	vars             map[string]interface{}
+	expectApplyError bool
+	objTestCases     []ObjectTestCase
+	sleepDuration    int
 }
 
 // struct used as input for function CondCreateObject

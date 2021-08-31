@@ -44,10 +44,13 @@ func TestTerraformS3Bucket(t *testing.T) {
 	// list of different buckets that will be created to be tested
 	var bucketTestCases = []BucketTestCase{
 		{
-			"TestBucket1",
-			[]string{"path/to/ro-folder"},
-			[]string{"path/to/rw-folder"},
-			[]ObjectTestCase{
+			testName: "TestBucket1",
+			vars: map[string]interface{}{
+				"test_bucket_name": fmt.Sprintf("terratest-s3-%s", strings.ToLower(random.UniqueId())),
+				"read_only_paths":  []string{"path/to/ro-folder"},
+				"read_write_paths": []string{"path/to/rw-folder"},
+			},
+			objTestCases: []ObjectTestCase{
 				{
 					key:             "path/to/ro-folder/obj1",
 					encryption:      "AES256",
@@ -67,13 +70,16 @@ func TestTerraformS3Bucket(t *testing.T) {
 					expectPassWrite: false,
 				},
 			},
-			0,
+			sleepDuration: 0,
 		},
 		{
-			"TestBucket2",
-			[]string{"other/path/to/ro-folder"},
-			[]string{"other/path/to/rw-folder"},
-			[]ObjectTestCase{
+			testName: "TestBucket2",
+			vars: map[string]interface{}{
+				"test_bucket_name": fmt.Sprintf("terratest-s3-%s", strings.ToLower(random.UniqueId())),
+				"read_only_paths":  []string{"other/path/to/ro-folder"},
+				"read_write_paths": []string{"other/path/to/rw-folder"},
+			},
+			objTestCases: []ObjectTestCase{
 				{
 					key: "path/to/ro-folder/obj1",
 					// not setting encryption here to make sure we cannot upload unencrypted objects
@@ -96,7 +102,7 @@ func TestTerraformS3Bucket(t *testing.T) {
 					expectPassWrite: false,
 				},
 			},
-			0,
+			sleepDuration: 0,
 		},
 	}
 
@@ -129,16 +135,11 @@ func TestTerraformS3Bucket(t *testing.T) {
 				terraform.Destroy(t, teraformOptions)
 			})
 
-			expectedBucketName := fmt.Sprintf("terratest-aws-s3-example-%s", strings.ToLower(random.UniqueId()))
 
 			test_structure.RunTestStage(t, "setup_options", func() {
 				terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 					TerraformDir: tempTestFolder,
-					Vars: map[string]interface{}{
-						"test_bucket_name": expectedBucketName,
-						"read_only_paths":  testCase.pathRO,
-						"read_write_paths": testCase.pathRW,
-					},
+					Vars:         testCase.vars,
 					EnvVars: map[string]string{
 						"AWS_REGION": awsRegion,
 					},
@@ -156,7 +157,7 @@ func TestTerraformS3Bucket(t *testing.T) {
 				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
 				bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, "test-bucket")
 				bucketName := bucketMap["bucket_name"].(string)
-				assert.Equal(t, expectedBucketName, bucketName)
+				assert.Equal(t, testCase.vars["test_bucket_name"], bucketName)
 				aws.AssertS3BucketExists(t, awsRegion, bucketName)
 				aws.AssertS3BucketPolicyExists(t, awsRegion, bucketName)
 			})
@@ -169,7 +170,7 @@ func TestTerraformS3Bucket(t *testing.T) {
 					CondCreateObject(CondCreateObjectInput{
 						t,
 						awsRegion,
-						expectedBucketName,
+						testCase.vars["test_bucket_name"].(string),
 						testBody,
 						obj,
 						defaultUploader,
@@ -225,21 +226,25 @@ func TestTerraformS3Bucket(t *testing.T) {
 				for _, obj := range testCase.objTestCases {
 					obj := obj
 
-					validatePutObject(validatePutObjectInput{
-						t,
-						awsRegion,
-						bucketName,
-						obj,
-						testBody,
-						assumedRoleSession,
+					t.Run("put_object", func(t *testing.T) {
+						validatePutObject(validatePutObjectInput{
+							t,
+							awsRegion,
+							bucketName,
+							obj,
+							testBody,
+							assumedRoleSession,
+						})
 					})
 
-					validateGetObject(validateGetObjectInput{
-						t,
-						bucketName,
-						obj,
-						testBody,
-						assumedRoleSession,
+					t.Run("get_object", func(t *testing.T) {
+						validateGetObject(validateGetObjectInput{
+							t,
+							bucketName,
+							obj,
+							testBody,
+							assumedRoleSession,
+						})
 					})
 				}
 			})
