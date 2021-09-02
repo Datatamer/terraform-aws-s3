@@ -13,6 +13,8 @@ import (
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,91 +29,65 @@ type ObjectTestCase struct {
 
 // define struct for each bucket Test Case
 type BucketTestCase struct {
-	testName         string
-	vars             map[string]interface{}
-	expectApplyError bool
-	objTestCases     []ObjectTestCase
-	sleepDuration    int
-}
-
-// struct used as input for function CondCreateObject
-type CondCreateObjectInput struct {
-	t         *testing.T
-	awsRegion string
-	bucket    string
-	body      string
-	obj       ObjectTestCase
-	uploader  *s3manager.Uploader
+	testName     string
+	vars         map[string]interface{}
+	objTestCases []ObjectTestCase
 }
 
 // CondCreateObject conditionally creates an S3 Object inside `bucket` with `body` content
 // It is called when we want to test ReadOnly path
 // Creates object with default AWS session that presumably has PutObject permission
-func CondCreateObject(input CondCreateObjectInput) {
+func CondCreateObject(t *testing.T, awsRegion string, bucket string, body string, obj ObjectTestCase) {
 	// When encryption isn't set, trying to upload with default AWS session would fail as well
 	// hence the check here
-	if input.obj.expectPassWrite || input.obj.encryption == "" {
+	if obj.expectPassWrite || obj.encryption == "" {
 		return
 	}
 
-	logger.Log(input.t, fmt.Sprintf("Default Credential: uploading object %s...", input.obj.key))
+	sess, err := aws.NewAuthenticatedSession(awsRegion)
+	if err != nil {
+		assert.FailNow(t, "Failed in creating session")
+	}
+	uploader := s3manager.NewUploader(sess)
 
-	err := UploadObjectWithUploaderE(UploadObjectWithUploaderInput{
-		input.awsRegion,
-		input.bucket,
-		input.obj.key,
-		input.obj.encryption,
-		input.body,
-		input.uploader,
-	})
+	logger.Log(t, fmt.Sprintf("Default Credential: uploading object %s...", obj.key))
 
-	require.NoError(input.t, err, "Error raised when trying to upload objects that would be tested in ReadOnly paths")
+	_, err = UploadObjectWithUploaderE(
+		awsRegion,
+		bucket,
+		obj.key,
+		obj.encryption,
+		body,
+		uploader,
+	)
 
-	logger.Log(input.t, fmt.Sprintf("Uploaded object %s with default credential", input.obj.key))
+	require.NoError(t, err, "Error raised when trying to upload objects that would be tested in ReadOnly paths")
+
+	logger.Log(t, fmt.Sprintf("Uploaded object %s with default credential", obj.key))
 
 }
 
-// struct used as input for function UploadObjectWithUploader
-type UploadObjectWithUploaderInput struct {
-	awsRegion  string
-	bucketName string
-	key        string
-	encryption string
-	body       string
-	uploader   *s3manager.Uploader
-}
-
-func UploadObjectWithUploaderE(input UploadObjectWithUploaderInput) error {
+func UploadObjectWithUploaderE(awsRegion string, bucketName string, key string, encryption string, body string, uploader *s3manager.Uploader) (*s3manager.UploadOutput, error) {
 	s3Input := &s3manager.UploadInput{
-		Bucket: &input.bucketName,
-		Key:    &input.key,
-		Body:   strings.NewReader(input.body),
+		Bucket: &bucketName,
+		Key:    &key,
+		Body:   strings.NewReader(body),
 	}
 
-	if input.encryption != "" {
-		s3Input.ServerSideEncryption = &input.encryption
+	if encryption != "" {
+		s3Input.ServerSideEncryption = &encryption
 	}
 
-	_, err := input.uploader.Upload(s3Input)
+	return uploader.Upload(s3Input)
 
-	return err
 }
 
-// struct used as input for function GetS3ObjectWithSession
-type GetS3ObjectWithSessionInput struct {
-	t *testing.T
-	// awsRegion string
-	bucket string
-	key    string
-	sess   *session.Session
-}
-
-func GetS3ObjectWithSessionE(input GetS3ObjectWithSessionInput) (string, error) {
-	s3Client := s3.New(input.sess)
+func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *session.Session) (string, error) {
+	s3Client := s3.New(sess)
 
 	res, err := s3Client.GetObject(&s3.GetObjectInput{
-		Bucket: &input.bucket,
-		Key:    &input.key,
+		Bucket: &bucket,
+		Key:    &key,
 	})
 
 	if err != nil {
@@ -125,106 +101,74 @@ func GetS3ObjectWithSessionE(input GetS3ObjectWithSessionInput) (string, error) 
 	}
 
 	contents := buf.String()
-	logger.Log(input.t, fmt.Sprintf("Read contents from s3://%s/%s", input.bucket, input.key))
+	logger.Log(t, fmt.Sprintf("Read contents from s3://%s/%s", bucket, key))
 
 	return contents, nil
 }
 
-// struct used as input for function validatePutObject
-type validatePutObjectInput struct {
-	t         *testing.T
-	awsRegion string
-	bucket    string
-	obj       ObjectTestCase
-	body      string
-	sess      *session.Session
-}
+func validatePutObject(t *testing.T, awsRegion string, bucket string, obj ObjectTestCase, body string, sess *session.Session) {
+	_, err := retry.DoWithRetryInterfaceE(t,
+		"Trying to upload S3 Object..",
+		4, 3*time.Second,
+		func() (interface{}, error) {
+			return UploadObjectWithUploaderE(awsRegion, bucket, obj.key, obj.encryption, body, s3manager.NewUploader(sess))
+		})
 
-func validatePutObject(input validatePutObjectInput) {
-	up := s3manager.NewUploader(input.sess)
-
-	upObjInput := UploadObjectWithUploaderInput{
-		input.awsRegion,
-		input.bucket,
-		input.obj.key,
-		input.obj.encryption,
-		input.body,
-		up,
-	}
-
-	if input.obj.expectPassWrite {
-		// upload and require no error
-		logger.Log(input.t, fmt.Sprintf("Try to upload using role: %s", input.obj.key))
-		err := UploadObjectWithUploaderE(upObjInput)
-		require.NoError(input.t, err)
-		logger.Log(input.t, fmt.Sprintf("%s uploaded using role", input.obj.key))
+	if obj.expectPassWrite {
+		logger.Log(t, fmt.Sprintf("Try to upload using module permissions: %s", obj.key))
+		require.NoError(t, err)
+		logger.Log(t, fmt.Sprintf("%s uploaded using module permissions", obj.key))
 	} else {
-		// try to upload, require error
-		err := UploadObjectWithUploaderE(upObjInput)
-		require.Error(input.t, err)
-		logger.Log(input.t, fmt.Sprintf("%s could not be uploaded using role", input.obj.key))
+		require.Error(t, err)
+		logger.Log(t, fmt.Sprintf("%s could not be uploaded using module permissions", obj.key))
 	}
 }
 
-// struct used as input for function validateGetObject
-type validateGetObjectInput struct {
-	t            *testing.T
-	bucket       string
-	obj          ObjectTestCase
-	expectedBody string
-	sess         *session.Session
-}
+func validateGetObject(t *testing.T, bucket string, obj ObjectTestCase, expectedBody string, sess *session.Session) {
+	body, err := retry.DoWithRetryE(t,
+		"Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
+		3, 5*time.Second,
+		func() (string, error) {
+			return GetS3ObjectWithSessionE(t, bucket, obj.key, sess)
+		})
 
-func validateGetObject(input validateGetObjectInput) {
-	getObjInput := GetS3ObjectWithSessionInput{
-		input.t,
-		input.bucket,
-		input.obj.key,
-		input.sess,
-	}
-
-	if input.obj.expectPassRead {
-		// read and require no error
-		objContent, err := retry.DoWithRetryE(input.t,
-			"Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
-			3, 5*time.Second,
-			func() (string, error) {
-				return GetS3ObjectWithSessionE(getObjInput)
-			})
-		require.NoError(input.t, err)
-		assert.Equal(input.t, input.expectedBody, objContent)
-		logger.Log(input.t, fmt.Sprintf("%s was read using role", input.obj.key))
+	if obj.expectPassRead {
+		require.NoError(t, err)
+		assert.Equal(t, expectedBody, body)
+		logger.Log(t, fmt.Sprintf("%s was read using role", obj.key))
 	} else {
-		// try to read, require error
-		_, err := retry.DoWithRetryE(input.t,
-			"Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
-			3, 5*time.Second,
-			func() (string, error) {
-				return GetS3ObjectWithSessionE(getObjInput)
-			})
-		require.Error(input.t, err)
-		logger.Log(input.t, fmt.Sprintf("%s could not be read using role", input.obj.key))
+		require.Error(t, err)
+		logger.Log(t, fmt.Sprintf("%s could not be read using role", obj.key))
 	}
 }
 
-// struct used as input for function assumeRoleWithRetry
-type assumeRoleWithRetryInput struct {
-	t         *testing.T
-	awsRegion string
-	roleARN   string
-}
-
-func assumeRoleWithRetry(input assumeRoleWithRetryInput) *session.Session {
-	// try to sts:AssumeRole the Role we created earlier
-	assumedRoleSession, err := retry.DoWithRetryInterfaceE(input.t,
+func assumeRoleWithRetry(t *testing.T, awsRegion string, roleARN string) *session.Session {
+	assumedRoleSession, err := retry.DoWithRetryInterfaceE(t,
 		"Trying to assume role...",
 		3, 5*time.Second,
 		func() (interface{}, error) {
-			return aws.NewAuthenticatedSessionFromRole(input.awsRegion, input.roleARN)
+			return aws.NewAuthenticatedSessionFromRole(awsRegion, roleARN)
 		})
 
 	// Fail test if sts:AssumeRole fails
-	require.NoError(input.t, err)
-	logger.Log(input.t, fmt.Sprintf("Assumed role %s successfully", input.roleARN))
+	require.NoError(t, err)
+	logger.Log(t, fmt.Sprintf("Assumed role %s successfully", roleARN))
 	return assumedRoleSession.(*session.Session)
 }
+
+func getPoliciesArnFromOutput(t *testing.T, testFolder string, outputName string) (rwPolicyARN string, roPolicyARN string) {
+	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, outputName)
+	return bucketMap["rw_policy_arn"].(string), bucketMap["ro_policy_arn"].(string)
+}
+
+func getBucketNameFromOutput(t *testing.T, testFolder string, outputName string) string {
+	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, outputName)
+	return bucketMap["bucket_name"].(string)
+}
+
+// func getBucketName(t *testing.T, testFolder string) string {
+// 	uniqueID := test_structure.LoadString(t, testFolder, "unique_id")
+// 	return fmt.Sprintf("terratest-s3-%s", uniqueID)
+// }
