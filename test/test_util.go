@@ -162,8 +162,3 @@ func getBucketNameFromOutput(t *testing.T, testFolder string, outputName string)
 	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, outputName)
 	return bucketMap["bucket_name"].(string)
 }
-
-// func getBucketName(t *testing.T, testFolder string) string {
-// 	uniqueID := test_structure.LoadString(t, testFolder, "unique_id")
-// 	return fmt.Sprintf("terratest-s3-%s", uniqueID)
-// }
