@@ -1,9 +1,9 @@
-module github.com/Datatamer/tamr-terraform-aws-s3
+module github.com/Datatamer/tamr-terraform-aws-s3/test
 
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.38.28
-	github.com/gruntwork-io/terratest v0.35.6
-	github.com/stretchr/testify v1.6.1
+	github.com/aws/aws-sdk-go v1.40.40
+	github.com/gruntwork-io/terratest v0.37.8
+	github.com/stretchr/testify v1.7.0
 )
