@@ -50,20 +50,44 @@ func initTestCases() []BucketTestCase {
 			testName: "TestBucket2",
 			vars: map[string]interface{}{
 				"test_bucket_name": "",
-				"read_only_paths":  []string{"other/path/to/ro-folder"},
-				"read_write_paths": []string{"other/path/to/rw-folder"},
+				"read_only_paths":  []string{"path1/to/ro-folder", "path2/to/ro-folder"},
+				"read_write_paths": []string{"path1/to/rw-folder", "path2/to/rw-folder"},
 			},
 			objTestCases: []ObjectTestCase{
 				{
-					key:             "other/path/to/ro-folder/obj1",
+					key:             "random/path/obj1",
+					encryption:      "AES256",
+					expectPassRead:  false,
+					expectPassWrite: false,
+				},
+				{
+					key:             "path1/to/ro-folder/obj1",
 					encryption:      "AES256",
 					expectPassRead:  true,
 					expectPassWrite: false,
 				},
 				{
-					key: "path/to/rw-folder/obj2",
+					key:             "path2/to/ro-folder/obj1",
+					encryption:      "AES256",
+					expectPassRead:  true,
+					expectPassWrite: false,
+				},
+				{
+					key:             "path1/to/rw-folder/obj1",
+					encryption:      "AES256",
+					expectPassRead:  true,
+					expectPassWrite: true,
+				},
+				{
+					key:             "path2/to/rw-folder/obj1",
+					encryption:      "AES256",
+					expectPassRead:  true,
+					expectPassWrite: true,
+				},
+				{
 					// not setting encryption here to make sure we cannot upload unencrypted objects
 					encryption:      "",
+					key:             "path1/to/rw-folder/obj2",
 					expectPassRead:  false,
 					expectPassWrite: false,
 				},
