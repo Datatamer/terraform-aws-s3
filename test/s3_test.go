@@ -190,7 +190,7 @@ func TestTerraformS3Module(t *testing.T) {
 
 				for _, obj := range testCase.objTestCases {
 					obj := obj
-					CondCreateObject(
+					MaybeCreateObject(
 						t,
 						awsRegion,
 						testCase.vars["test_bucket_name"].(string),

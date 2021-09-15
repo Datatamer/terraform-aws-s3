@@ -34,10 +34,10 @@ type BucketTestCase struct {
 	objTestCases []ObjectTestCase
 }
 
-// CondCreateObject conditionally creates an S3 Object inside `bucket` with `body` content
+// MaybeCreateObject conditionally creates an S3 Object inside `bucket` with `body` content
 // It is called when we want to test ReadOnly path
 // Creates object with default AWS session that presumably has PutObject permission
-func CondCreateObject(t *testing.T, awsRegion string, bucket string, body string, obj ObjectTestCase) {
+func MaybeCreateObject(t *testing.T, awsRegion string, bucket string, body string, obj ObjectTestCase) {
 	// When encryption isn't set, trying to upload with default AWS session would fail as well
 	// hence the check here
 	if obj.expectPassWrite || obj.encryption == "" {
