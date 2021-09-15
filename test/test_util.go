@@ -125,12 +125,7 @@ func validatePutObject(t *testing.T, awsRegion string, bucket string, obj Object
 }
 
 func validateGetObject(t *testing.T, bucket string, obj ObjectTestCase, expectedBody string, sess *session.Session) {
-	body, err := retry.DoWithRetryE(t,
-		"Trying to read S3 Object. We may not have permission or just be waiting it to be uploaded and available",
-		3, 5*time.Second,
-		func() (string, error) {
-			return GetS3ObjectWithSessionE(t, bucket, obj.key, sess)
-		})
+	body, err := GetS3ObjectWithSessionE(t, bucket, obj.key, sess)
 
 	if obj.expectPassRead {
 		require.NoError(t, err)
