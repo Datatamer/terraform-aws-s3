@@ -143,6 +143,7 @@ func TestTerraformS3Module(t *testing.T) {
 					Vars:         testCase.vars,
 					EnvVars: map[string]string{
 						"AWS_REGION": awsRegion,
+						"AWS_DEFAULT_REGION": awsRegion,
 					},
 				})
 
