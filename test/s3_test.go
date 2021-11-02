@@ -18,7 +18,8 @@ const output_bucket = "test-bucket"
 func initTestCases() []BucketTestCase {
 	return []BucketTestCase{
 		{
-			testName: "TestBucket1",
+			testName:         "TestBucketSinglePath",
+			expectApplyError: false,
 			vars: map[string]interface{}{
 				"test_bucket_name": "",
 				"read_only_paths":  []string{"path/to/ro-folder"},
@@ -46,7 +47,8 @@ func initTestCases() []BucketTestCase {
 			},
 		},
 		{
-			testName: "TestBucket2",
+			testName:         "TestBucketMultiplePaths",
+			expectApplyError: false,
 			vars: map[string]interface{}{
 				"test_bucket_name": "",
 				"read_only_paths":  []string{"path1/to/ro-folder", "path2/to/ro-folder"},
@@ -142,7 +144,7 @@ func TestTerraformS3Module(t *testing.T) {
 					TerraformDir: tempTestFolder,
 					Vars:         testCase.vars,
 					EnvVars: map[string]string{
-						"AWS_REGION": awsRegion,
+						"AWS_REGION":         awsRegion,
 						"AWS_DEFAULT_REGION": awsRegion,
 					},
 				})
@@ -152,7 +154,13 @@ func TestTerraformS3Module(t *testing.T) {
 
 			test_structure.RunTestStage(t, "create_bucket", func() {
 				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
-				terraform.InitAndApply(t, terraformOptions)
+				_, err := terraform.InitAndApplyE(t, terraformOptions)
+
+				if testCase.expectApplyError {
+					require.Error(t, err)
+					// If it failed as expected, we should skip the rest (validate function).
+					t.SkipNow()
+				}
 			})
 
 			test_structure.RunTestStage(t, "validate_bucket", func() {
@@ -221,7 +229,6 @@ func TestTerraformS3Module(t *testing.T) {
 					obj := obj
 
 					t.Run("put_object", func(t *testing.T) {
-						// we don't run this in parallel just to win some time for s3 GetObject API to be available right after.
 						validatePutObject(t, awsRegion, bucketName, obj, test_body, assumedRoleSession)
 					})
 

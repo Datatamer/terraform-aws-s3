@@ -29,9 +29,10 @@ type ObjectTestCase struct {
 
 // define struct for each bucket Test Case
 type BucketTestCase struct {
-	testName     string
-	vars         map[string]interface{}
-	objTestCases []ObjectTestCase
+	testName         string
+	expectApplyError bool
+	vars             map[string]interface{}
+	objTestCases     []ObjectTestCase
 }
 
 // MaybeCreateObject conditionally creates an S3 Object inside `bucket` with `body` content
@@ -67,6 +68,8 @@ func MaybeCreateObject(t *testing.T, awsRegion string, bucket string, body strin
 
 }
 
+// UploadObjectWithUploaderE uploads an object into an s3 bucket with a specific *s3manager.Uploader object that should have been intialized. It returns the s3manager.UploadOutput
+// object and an error.
 func UploadObjectWithUploaderE(awsRegion string, bucketName string, key string, encryption string, body string, uploader *s3manager.Uploader) (*s3manager.UploadOutput, error) {
 	s3Input := &s3manager.UploadInput{
 		Bucket: &bucketName,
@@ -82,6 +85,7 @@ func UploadObjectWithUploaderE(awsRegion string, bucketName string, key string, 
 
 }
 
+// GetS3ObjectWithSessionE will read an s3 object using a specific *session.Session. It returns the string of contents (body) of the object.
 func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *session.Session) (string, error) {
 	s3Client := s3.New(sess)
 
@@ -106,6 +110,9 @@ func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *sess
 	return contents, nil
 }
 
+// validatePutObject validates that the role created with the policies from s3 module is able to PUT objects into the specified
+// bucket using the key provided. This method is useful for testing different paths. The specific logic of "expect*" should be
+// initialized manually by the tester.
 func validatePutObject(t *testing.T, awsRegion string, bucket string, obj ObjectTestCase, body string, sess *session.Session) {
 	_, err := retry.DoWithRetryInterfaceE(t,
 		"Trying to upload S3 Object..",
@@ -124,6 +131,9 @@ func validatePutObject(t *testing.T, awsRegion string, bucket string, obj Object
 	}
 }
 
+// validateGetObject validates that the role created with the policies from s3 module is able to GET objects from the specified
+// bucket. The object will have been created before getting here. This method is useful for testing different paths.
+// The specific logic of "expect*" should be initialized manually by the tester.
 func validateGetObject(t *testing.T, bucket string, obj ObjectTestCase, expectedBody string, sess *session.Session) {
 	body, err := GetS3ObjectWithSessionE(t, bucket, obj.key, sess)
 
@@ -137,6 +147,8 @@ func validateGetObject(t *testing.T, bucket string, obj ObjectTestCase, expected
 	}
 }
 
+// assumeRoleWithRetry uses `retry` package to assume the specified role. Retrying is needed since we are dealing with IAM API
+// to create a role and attach permissions. Those updates are done "almost immediately", which may cause inconsistency errors if `retry` is not applied.
 func assumeRoleWithRetry(t *testing.T, awsRegion string, roleARN string) *session.Session {
 	assumedRoleSession, err := retry.DoWithRetryInterfaceE(t,
 		"Trying to assume role...",
@@ -151,12 +163,16 @@ func assumeRoleWithRetry(t *testing.T, awsRegion string, roleARN string) *sessio
 	return assumedRoleSession.(*session.Session)
 }
 
+// getPoliciesArnFromOutput is a helper function that will retrieve two outputs from a TF folder that is expected to be the root of test.
+// Values are returned already casted as string.
 func getPoliciesArnFromOutput(t *testing.T, testFolder string, outputName string) (rwPolicyARN string, roPolicyARN string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, outputName)
 	return bucketMap["rw_policy_arn"].(string), bucketMap["ro_policy_arn"].(string)
 }
 
+// getBucketNameFromOutput is a helper function that will retrieve the bucket name output from a TF folder that is expected to be the root of test.
+// Value is returned already casted as string.
 func getBucketNameFromOutput(t *testing.T, testFolder string, outputName string) string {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, outputName)

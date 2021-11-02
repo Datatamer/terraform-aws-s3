@@ -1,3 +1,3 @@
 output "test-bucket" {
-  value = module.minimal
+  value = module.minimal.test-bucket
 }
