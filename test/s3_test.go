@@ -144,8 +144,7 @@ func TestTerraformS3Module(t *testing.T) {
 					TerraformDir: tempTestFolder,
 					Vars:         testCase.vars,
 					EnvVars: map[string]string{
-						"AWS_REGION":         awsRegion,
-						"AWS_DEFAULT_REGION": awsRegion,
+						"AWS_REGION": awsRegion,
 					},
 				})
 
@@ -194,6 +193,7 @@ func TestTerraformS3Module(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "setup_role_options", func() {
+				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
 				rwPolicyARN, roPolicyARN := getPoliciesArnFromOutput(t, tempTestFolder, output_bucket)
 				uniqueID := test_structure.LoadString(t, tempTestFolder, "unique_id")
 
@@ -202,6 +202,9 @@ func TestTerraformS3Module(t *testing.T) {
 					Vars: map[string]interface{}{
 						"name_prefix":  uniqueID,
 						"policies_arn": []string{rwPolicyARN, roPolicyARN},
+					},
+					EnvVars: map[string]string{
+						"AWS_REGION": awsRegion,
 					},
 				})
 				test_structure.SaveTerraformOptions(t, roleTempTestFolder, roleTerraformOptions)
