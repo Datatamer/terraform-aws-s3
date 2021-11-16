@@ -114,6 +114,8 @@ func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *sess
 // bucket using the key provided. This method is useful for testing different paths. The specific logic of "expect*" should be
 // initialized manually by the tester.
 func validatePutObject(t *testing.T, awsRegion string, bucket string, obj ObjectTestCase, body string, sess *session.Session) {
+	// IAM updates are not instantaneous. We created the role and updated its permissions not long before this code runs.
+	// Hence the need for retrying here.
 	_, err := retry.DoWithRetryInterfaceE(t,
 		"Trying to upload S3 Object..",
 		4, 3*time.Second,
