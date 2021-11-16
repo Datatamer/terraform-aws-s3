@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// define struct for each object Test Case
+// ObjectTestCase defines struct for each S3 object Test Case
 type ObjectTestCase struct {
 	key             string
 	encryption      string
@@ -27,7 +27,7 @@ type ObjectTestCase struct {
 	expectPassWrite bool
 }
 
-// define struct for each bucket Test Case
+// BucketTestCase defines struct for each S3 bucket Test Case
 type BucketTestCase struct {
 	testName         string
 	expectApplyError bool

@@ -97,6 +97,7 @@ func initTestCases() []BucketTestCase {
 	}
 }
 
+// TestTerraformS3Module is the main function that will initialize TestCases and run all tests
 func TestTerraformS3Module(t *testing.T) {
 	// Override random region if needed.
 	// os.Setenv("TERRATEST_REGION", "us-east-1")
