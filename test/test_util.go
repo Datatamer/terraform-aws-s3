@@ -54,7 +54,6 @@ func MaybeCreateObject(t *testing.T, awsRegion string, bucket string, body strin
 	logger.Log(t, fmt.Sprintf("Default Credential: uploading object %s...", obj.key))
 
 	_, err = UploadObjectWithUploaderE(
-		awsRegion,
 		bucket,
 		obj.key,
 		obj.encryption,
@@ -70,7 +69,7 @@ func MaybeCreateObject(t *testing.T, awsRegion string, bucket string, body strin
 
 // UploadObjectWithUploaderE uploads an object into an s3 bucket with a specific *s3manager.Uploader object that should have been intialized. It returns the s3manager.UploadOutput
 // object and an error.
-func UploadObjectWithUploaderE(awsRegion string, bucketName string, key string, encryption string, body string, uploader *s3manager.Uploader) (*s3manager.UploadOutput, error) {
+func UploadObjectWithUploaderE(bucketName string, key string, encryption string, body string, uploader *s3manager.Uploader) (*s3manager.UploadOutput, error) {
 	s3Input := &s3manager.UploadInput{
 		Bucket: &bucketName,
 		Key:    &key,
@@ -82,15 +81,14 @@ func UploadObjectWithUploaderE(awsRegion string, bucketName string, key string, 
 	}
 
 	return uploader.Upload(s3Input)
-
 }
 
 // GetS3ObjectWithSessionE will read an s3 object using a specific *session.Session. It returns the string of contents (body) of the object.
-func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *session.Session) (string, error) {
+func GetS3ObjectWithSessionE(t *testing.T, bucketName string, key string, sess *session.Session) (string, error) {
 	s3Client := s3.New(sess)
 
 	res, err := s3Client.GetObject(&s3.GetObjectInput{
-		Bucket: &bucket,
+		Bucket: &bucketName,
 		Key:    &key,
 	})
 
@@ -105,7 +103,7 @@ func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *sess
 	}
 
 	contents := buf.String()
-	logger.Log(t, fmt.Sprintf("Read contents from s3://%s/%s", bucket, key))
+	logger.Log(t, fmt.Sprintf("Read contents from s3://%s/%s", bucketName, key))
 
 	return contents, nil
 }
@@ -113,14 +111,14 @@ func GetS3ObjectWithSessionE(t *testing.T, bucket string, key string, sess *sess
 // validatePutObject validates that the role created with the policies from s3 module is able to PUT objects into the specified
 // bucket using the key provided. This method is useful for testing different paths. The specific logic of "expect*" should be
 // initialized manually by the tester.
-func validatePutObject(t *testing.T, awsRegion string, bucket string, obj ObjectTestCase, body string, sess *session.Session) {
+func validatePutObject(t *testing.T, bucketName string, obj ObjectTestCase, body string, sess *session.Session) {
 	// IAM updates are not instantaneous. We created the role and updated its permissions not long before this code runs.
 	// Hence the need for retrying here.
 	_, err := retry.DoWithRetryInterfaceE(t,
 		"Trying to upload S3 Object..",
 		4, 3*time.Second,
 		func() (interface{}, error) {
-			return UploadObjectWithUploaderE(awsRegion, bucket, obj.key, obj.encryption, body, s3manager.NewUploader(sess))
+			return UploadObjectWithUploaderE(bucketName, obj.key, obj.encryption, body, s3manager.NewUploader(sess))
 		})
 
 	if obj.expectPassWrite {

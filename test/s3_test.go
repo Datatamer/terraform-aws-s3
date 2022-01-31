@@ -233,7 +233,7 @@ func TestTerraformS3Module(t *testing.T) {
 					obj := obj
 
 					t.Run("put_object", func(t *testing.T) {
-						validatePutObject(t, awsRegion, bucketName, obj, test_body, assumedRoleSession)
+						validatePutObject(t, bucketName, obj, test_body, assumedRoleSession)
 					})
 
 					t.Run("get_object", func(t *testing.T) {
