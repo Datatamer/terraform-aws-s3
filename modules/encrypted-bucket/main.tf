@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "new_bucket" { #tfsec:ignore:AWS002
+resource "aws_s3_bucket" "new_bucket" { #tfsec:ignore:AWS002, AWS077 and AWS098
   bucket = var.bucket_name
   acl    = "private"
 
