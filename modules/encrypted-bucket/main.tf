@@ -1,4 +1,5 @@
-resource "aws_s3_bucket" "new_bucket" { #tfsec:ignore:AWS002
+#tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-specify-public-access-block
+resource "aws_s3_bucket" "new_bucket" {
   bucket = var.bucket_name
   acl    = "private"
 

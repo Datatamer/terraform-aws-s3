@@ -37,7 +37,7 @@ This modules creates:
 | Name | Version |
 |------|---------|
 | terraform | >= 0.13 |
-| aws | >= 3.36.0 |
+| aws | >= 3.36.0, < 4.0.0 |
 
 ## Providers
 

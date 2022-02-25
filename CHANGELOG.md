@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v1.1.1 - February 12th 2022
+* Updates version file to prevent the major upgrade to the AWS provider version 4.0.
+
 ## v1.1.0 - July 12nd 2021
 * Adds tags for IAM policies
 * Adds new variable `tags` to set tags for all resources

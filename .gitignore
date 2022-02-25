@@ -46,3 +46,6 @@ ops-makefile
 
 # VisualStudioCode
 .vscode/
+
+# Ignore tfvars
+**/*.tfvars
