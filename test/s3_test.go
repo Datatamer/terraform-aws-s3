@@ -12,12 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// string to be used as key of the bucket name output.
 const output_bucket = "test-bucket"
+
+// string to be used as body for files to be created.
+const test_body = "test"
 
 // initTestCases returns a list of BucketTestCase to be used for tests.
 func initTestCases() []BucketTestCase {
 	return []BucketTestCase{
 		{
+			region:           "",
+			bucket_name:      "",
 			testName:         "TestBucketSinglePath",
 			expectApplyError: false,
 			vars: map[string]interface{}{
@@ -47,6 +53,8 @@ func initTestCases() []BucketTestCase {
 			},
 		},
 		{
+			region:           "",
+			bucket_name:      "",
 			testName:         "TestBucketMultiplePaths",
 			expectApplyError: false,
 			vars: map[string]interface{}{
@@ -101,9 +109,6 @@ func initTestCases() []BucketTestCase {
 func TestTerraformS3Module(t *testing.T) {
 	// Override random region if needed.
 	// os.Setenv("TERRATEST_REGION", "us-east-1")
-
-	// string to be used as body for files to be created
-	const test_body = "test"
 
 	// list of different buckets that will be created to be tested
 	bucketTestCases := initTestCases()
@@ -164,28 +169,18 @@ func TestTerraformS3Module(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "validate_bucket", func() {
-				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
-				bucketName := getBucketNameFromOutput(t, tempTestFolder, output_bucket)
-				require.Equal(t, testCase.vars["test_bucket_name"], bucketName)
-				aws.AssertS3BucketExists(t, awsRegion, bucketName)
-				aws.AssertS3BucketPolicyExists(t, awsRegion, bucketName)
+				testCase.region = test_structure.LoadString(t, tempTestFolder, "region")
+				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
+
+				validateBucket(t, terraformOptions, testCase)
 			})
 
 			// in here we use Terratest user (default AWS env or TERRATEST_IAM_ROLE env var)
 			// to create objects that should be tested in ReadOnly paths of the policies
 			test_structure.RunTestStage(t, "create_ro_objects", func() {
-				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
 
-				for _, obj := range testCase.objTestCases {
-					obj := obj
-					MaybeCreateObject(
-						t,
-						awsRegion,
-						testCase.vars["test_bucket_name"].(string),
-						test_body,
-						obj,
-					)
-				}
+				testCase.region = test_structure.LoadString(t, tempTestFolder, "region")
+				validateCreateObjects(t, testCase)
 			})
 
 			defer test_structure.RunTestStage(t, "teardown_role", func() {
@@ -195,8 +190,9 @@ func TestTerraformS3Module(t *testing.T) {
 
 			test_structure.RunTestStage(t, "setup_role_options", func() {
 				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
-				rwPolicyARN, roPolicyARN := getPoliciesArnFromOutput(t, tempTestFolder, output_bucket)
 				uniqueID := test_structure.LoadString(t, tempTestFolder, "unique_id")
+				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
+				rwPolicyARN, roPolicyARN := getPoliciesArnFromOutput(t, terraformOptions)
 
 				roleTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 					TerraformDir: roleTempTestFolder,
@@ -217,29 +213,11 @@ func TestTerraformS3Module(t *testing.T) {
 			})
 
 			test_structure.RunTestStage(t, "validate_bucket_and_policies", func() {
-				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
-				// load terraform environments
+				testCase.region = test_structure.LoadString(t, tempTestFolder, "region")
 				roleTerraformOptions := test_structure.LoadTerraformOptions(t, roleTempTestFolder)
 				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
 
-				// grab outputs
-				bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, output_bucket)
-				bucketName := bucketMap["bucket_name"].(string)
-				assumeRoleARN := terraform.Output(t, roleTerraformOptions, "role_arn")
-
-				assumedRoleSession := assumeRoleWithRetry(t, awsRegion, assumeRoleARN)
-
-				for _, obj := range testCase.objTestCases {
-					obj := obj
-
-					t.Run("put_object", func(t *testing.T) {
-						validatePutObject(t, bucketName, obj, test_body, assumedRoleSession)
-					})
-
-					t.Run("get_object", func(t *testing.T) {
-						validateGetObject(t, bucketName, obj, test_body, assumedRoleSession)
-					})
-				}
+				validateBucketAndPolicies(t, terraformOptions, roleTerraformOptions, testCase)
 			})
 		})
 	}
