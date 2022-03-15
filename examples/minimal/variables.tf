@@ -11,3 +11,13 @@ variable "tags" {
     Environment = "Example"
   }
 }
+
+variable "read_only_paths" {
+  type    = list(string)
+  default = ["path/to/ro-folder"]
+}
+
+variable "read_write_paths" {
+  type    = list(string)
+  default = ["path/to/rw-folder", "path/to/another-rw-folder"]
+}
