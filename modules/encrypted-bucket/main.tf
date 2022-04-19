@@ -1,15 +1,7 @@
-#tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-specify-public-access-block
+#tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket" "new_bucket" {
   bucket = var.bucket_name
   acl    = "private"
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
 
   force_destroy = var.force_destroy
   tags          = var.tags
@@ -25,4 +17,15 @@ resource "aws_s3_bucket_policy" "sse_bucket_policy" {
       arn_partition = var.arn_partition
     }
   )
+}
+
+# Sets S3 bucket default bucket encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "encryption_for_new_bucket" {
+  bucket = aws_s3_bucket.new_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+}
 }
