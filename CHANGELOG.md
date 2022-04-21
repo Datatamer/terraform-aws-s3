@@ -1,6 +1,6 @@
 # Tamr S3 Module Repo
 
-## v1.1.2 - April 21st 2022
+## v1.2.1 - April 21st 2022
 * Replaces deprecated S3 arguments by resource blocks.
 * Replaces deprecated IAM policy document argument names.
 
