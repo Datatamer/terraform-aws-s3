@@ -4,6 +4,9 @@
 * Replaces deprecated S3 arguments by resource blocks.
 * Replaces deprecated IAM policy document argument names.
 
+## v1.2.0 - April 18th 2022
+* Resolves S3 bucket public access block tfsec vulnerability.
+
 ## v1.1.1 - February 12th 2022
 * Updates version file to prevent the major upgrade to the AWS provider version 4.0.
 
