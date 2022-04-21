@@ -1,4 +1,4 @@
-#tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-specify-public-access-block
+#tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 resource "aws_s3_bucket" "new_bucket" {
   bucket = var.bucket_name
   acl    = "private"
@@ -25,4 +25,13 @@ resource "aws_s3_bucket_policy" "sse_bucket_policy" {
       arn_partition = var.arn_partition
     }
   )
+}
+
+resource "aws_s3_bucket_public_access_block" "for_new_bucket" {
+  bucket = aws_s3_bucket.new_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
