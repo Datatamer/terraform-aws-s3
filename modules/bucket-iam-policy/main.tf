@@ -29,8 +29,8 @@ data "aws_iam_policy_document" "ro_source_policy_doc" {
 data "aws_iam_policy_document" "path_specific_ro_doc" {
   count = length(local.ro_paths) == 0 ? 0 : 1
 
-  version     = "2012-10-17"
-  source_json = data.aws_iam_policy_document.ro_source_policy_doc[0].json
+  version                 = "2012-10-17"
+  source_policy_documents = [data.aws_iam_policy_document.ro_source_policy_doc[0].json]
 
   dynamic "statement" {
     for_each = local.ro_paths_map
@@ -86,8 +86,8 @@ data "aws_iam_policy_document" "rw_source_policy_doc" {
 data "aws_iam_policy_document" "path_specific_rw_doc" {
   count = length(var.read_write_paths) == 0 ? 0 : 1
 
-  version     = "2012-10-17"
-  source_json = data.aws_iam_policy_document.rw_source_policy_doc[0].json
+  version                 = "2012-10-17"
+  source_policy_documents = [data.aws_iam_policy_document.rw_source_policy_doc[0].json]
 
   dynamic "statement" {
     for_each = local.rw_paths_map

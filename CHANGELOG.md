@@ -1,5 +1,9 @@
 # Tamr S3 Module Repo
 
+## v1.2.1 - April 21st 2022
+* Replaces deprecated S3 arguments with resource blocks.
+* Replaces deprecated IAM policy document argument names.
+
 ## v1.2.0 - April 18th 2022
 * Resolves S3 bucket public access block tfsec vulnerability.
 
