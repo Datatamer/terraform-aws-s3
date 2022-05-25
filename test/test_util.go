@@ -28,6 +28,7 @@ type ObjectTestCase struct {
 
 // BucketTestCase defines struct for each S3 bucket Test Case
 type BucketTestCase struct {
+	tfDir            string
 	testName         string
 	expectApplyError bool
 	vars             map[string]interface{}
