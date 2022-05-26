@@ -132,7 +132,7 @@ func TestTerraformS3Module(t *testing.T) {
 
 			// These will create a tempTestFolder for each bucketTestCase.
 			tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", testCase.tfDir)
-			roleTempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "test_examples/helpers/iam_lpp")
+			// roleTempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "test_examples/helpers/iam_lpp")
 
 			// this stage will generate a random `awsRegion` and a `uniqueId` to be used in tests.
 			test_structure.RunTestStage(t, "pick_new_randoms", func() {
@@ -171,7 +171,6 @@ func TestTerraformS3Module(t *testing.T) {
 					BackendConfig: backendConfig,
 					MaxRetries:    5,
 				})
-
 				test_structure.SaveTerraformOptions(t, tempTestFolder, terraformOptions)
 			})
 
@@ -209,41 +208,11 @@ func TestTerraformS3Module(t *testing.T) {
 				validateCreateObjects(t, testCase)
 			})
 
-			defer test_structure.RunTestStage(t, "teardown_role", func() {
-				teraformOptions := test_structure.LoadTerraformOptions(t, roleTempTestFolder)
-				terraform.Destroy(t, teraformOptions)
-			})
-
-			test_structure.RunTestStage(t, "setup_role_options", func() {
-				awsRegion := test_structure.LoadString(t, tempTestFolder, "region")
-				uniqueID := test_structure.LoadString(t, tempTestFolder, "unique_id")
-				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
-				rwPolicyARN, roPolicyARN := getPoliciesArnFromOutput(t, terraformOptions)
-
-				roleTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-					TerraformDir: roleTempTestFolder,
-					Vars: map[string]interface{}{
-						"name_prefix":  uniqueID,
-						"policies_arn": []string{rwPolicyARN, roPolicyARN},
-					},
-					EnvVars: map[string]string{
-						"AWS_REGION": awsRegion,
-					},
-				})
-				test_structure.SaveTerraformOptions(t, roleTempTestFolder, roleTerraformOptions)
-			})
-
-			test_structure.RunTestStage(t, "create_role", func() {
-				roleTerraformOptions := test_structure.LoadTerraformOptions(t, roleTempTestFolder)
-				terraform.InitAndApply(t, roleTerraformOptions)
-			})
-
 			test_structure.RunTestStage(t, "validate_bucket_and_policies", func() {
 				testCase.region = test_structure.LoadString(t, tempTestFolder, "region")
-				roleTerraformOptions := test_structure.LoadTerraformOptions(t, roleTempTestFolder)
 				terraformOptions := test_structure.LoadTerraformOptions(t, tempTestFolder)
 
-				validateBucketAndPolicies(t, terraformOptions, roleTerraformOptions, testCase)
+				validateBucketAndPolicies(t, terraformOptions, testCase)
 			})
 		})
 	}

@@ -126,13 +126,6 @@ func assumeRoleWithRetry(t *testing.T, awsRegion string, roleARN string) *sessio
 	return assumedRoleSession.(*session.Session)
 }
 
-// getPoliciesArnFromOutput is a helper function that will retrieve two outputs from a TF folder that is expected to be the root of test.
-// Values are returned already casted as string.
-func getPoliciesArnFromOutput(t *testing.T, terraformOptions *terraform.Options) (rwPolicyARN string, roPolicyARN string) {
-	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, output_bucket)
-	return bucketMap["rw_policy_arn"].(string), bucketMap["ro_policy_arn"].(string)
-}
-
 // validateCreateObjects conditionally creates an S3 Object inside `bucket` with `body` content
 // It is called when we want to test ReadOnly path
 // Creates object with default AWS session that presumably has PutObject permission
@@ -179,11 +172,11 @@ func validateBucket(t *testing.T, terraformOptions *terraform.Options, testCase 
 }
 
 //validateBucketAndPolicies performs creation and reading of S3 objects according to the role previously created to validate permissions.
-func validateBucketAndPolicies(t *testing.T, terraformOptions *terraform.Options, roleTerraformOptions *terraform.Options, testCase BucketTestCase) {
+func validateBucketAndPolicies(t *testing.T, terraformOptions *terraform.Options, testCase BucketTestCase) {
 	// grab outputs
 	bucketMap := terraform.OutputMapOfObjects(t, terraformOptions, output_bucket)
 	bucketName := bucketMap["bucket_name"].(string)
-	assumeRoleARN := terraform.Output(t, roleTerraformOptions, "role_arn")
+	assumeRoleARN := terraform.Output(t, terraformOptions, "role_arn")
 	assumedRoleSession := assumeRoleWithRetry(t, testCase.region, assumeRoleARN)
 
 	for _, obj := range testCase.objTestCases {
