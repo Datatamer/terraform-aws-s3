@@ -161,6 +161,7 @@ func TestTerraformS3Module(t *testing.T) {
 				backendConfig := terratestutils.ParseBackendConfig(t, gcsTestExamplesURL, testCase.testName, testCase.tfDir)
 
 				testCase.vars["test_bucket_name"] = fmt.Sprintf("terratest-s3-%s", uniqueID)
+				testCase.vars["name_prefix"] = uniqueID
 
 				terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 					TerraformDir: tempTestFolder,
