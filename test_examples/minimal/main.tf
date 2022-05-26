@@ -26,8 +26,12 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.account-assume-role-policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "this" {
-  for_each   = toset([module.minimal.test-bucket.ro_policy_arn, module.minimal.test-bucket.rw_policy_arn])
+resource "aws_iam_role_policy_attachment" "ro" {
   role       = aws_iam_role.this.name
-  policy_arn = each.value
+  policy_arn = module.minimal.test-bucket.ro_policy_arn
+}
+
+resource "aws_iam_role_policy_attachment" "rw" {
+  role       = aws_iam_role.this.name
+  policy_arn = module.minimal.test-bucket.rw_policy_arn
 }
