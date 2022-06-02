@@ -132,7 +132,6 @@ func TestTerraformS3Module(t *testing.T) {
 
 			// These will create a tempTestFolder for each bucketTestCase.
 			tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", testCase.tfDir)
-			// roleTempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "test_examples/helpers/iam_lpp")
 
 			// this stage will generate a random `awsRegion` and a `uniqueId` to be used in tests.
 			test_structure.RunTestStage(t, "pick_new_randoms", func() {
