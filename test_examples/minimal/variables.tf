@@ -14,3 +14,7 @@ variable "read_write_paths" {
   type        = list(string)
   default     = []
 }
+
+variable "name_prefix" {
+  type = string
+}
