@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v1.3.0 - June 9th 2022
+* Adds S3 bucket server access log opt-in / opt-out feature.
+
 ## v1.2.1 - April 21st 2022
 * Replaces deprecated S3 arguments with resource blocks.
 * Replaces deprecated IAM policy document argument names.

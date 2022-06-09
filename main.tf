@@ -1,5 +1,6 @@
 locals {
   effective_tags = length(var.tags) > 0 ? var.tags : var.additional_tags
+#  s3_bucket_logging = length(var.s3_bucket_logging) > 0 ? var.s3_bucket_logging : 0
 }
 
 module "encrypted-bucket" {
@@ -7,6 +8,7 @@ module "encrypted-bucket" {
   bucket_name   = var.bucket_name
   force_destroy = var.force_destroy
   arn_partition = var.arn_partition
+  s3_bucket_logging = var.s3_bucket_logging
   tags          = local.effective_tags
 }
 
