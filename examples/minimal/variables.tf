@@ -25,5 +25,5 @@ variable "read_write_paths" {
 variable "s3_bucket_logging" {
   description = "The name of S3 bucket where to store server access logs."
   type        = string
-  default     = "aws-logs-327120324092-us-east-2"
+  default     = ""
 }

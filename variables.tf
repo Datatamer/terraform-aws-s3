@@ -85,5 +85,5 @@ variable "read_write_actions" {
 variable "s3_bucket_logging" {
   description = "The name of S3 bucket where to store server access logs."
   type        = string
-  default = ""
+  default     = ""
 }

@@ -1,6 +1,5 @@
 #tfsec:ignore:aws-s3-enable-bucket-encryption:tfsec is yet not detecting the aws_s3_bucket_server_side_encryption_configuration resource block. https://github.com/aquasecurity/defsec/issues/489
 #tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
-
 resource "aws_s3_bucket" "new_bucket" {
   bucket = var.bucket_name
 
@@ -46,8 +45,8 @@ resource "aws_s3_bucket_public_access_block" "for_new_bucket" {
 }
 
 resource "aws_s3_bucket_logging" "s3_bucket_logging" {
-  count = length(var.s3_bucket_logging) > 0 ? 1 : 0  
-  bucket = aws_s3_bucket.new_bucket.id
+  count         = length(var.s3_bucket_logging) > 0 ? 1 : 0
+  bucket        = aws_s3_bucket.new_bucket.id
   target_bucket = var.s3_bucket_logging
   target_prefix = "log/"
 }
