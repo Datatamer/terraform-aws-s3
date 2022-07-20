@@ -21,3 +21,9 @@ variable "read_write_paths" {
   type    = list(string)
   default = ["path/to/rw-folder", "path/to/another-rw-folder"]
 }
+
+variable "s3_bucket_logging" {
+  description = "The name of S3 bucket where to store server access logs."
+  type        = string
+  default     = ""
+}

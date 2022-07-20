@@ -30,3 +30,9 @@ variable "arn_partition" {
   EOF
   default     = "aws"
 }
+
+variable "s3_bucket_logging" {
+  description = "The name of S3 bucket where to store server access logs."
+  type        = string
+  default     = ""
+}
