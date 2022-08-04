@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v1.3.1 - August 4th 2022
+* Adjusts AWS provider constraints to allow newer versions
+
 ## v1.3.0 - June 9th 2022
 * Adds S3 bucket server access log opt-in/opt-out feature.
 
