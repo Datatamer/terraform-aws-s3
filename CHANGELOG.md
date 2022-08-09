@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v1.3.2 - August 9th 2022
+* Fixes a bug where two resources were controlling server side encryption
+
 ## v1.3.1 - August 4th 2022
 * Adjusts AWS provider constraints to allow newer versions
 
