@@ -5,6 +5,13 @@ resource "aws_s3_bucket" "new_bucket" {
 
   force_destroy = var.force_destroy
   tags          = var.tags
+
+  # Managed by resource below
+  lifecycle {
+    ignore_changes = [
+      server_side_encryption_configuration,
+    ]
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption_for_new_bucket" {
