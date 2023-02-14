@@ -45,6 +45,16 @@ data "aws_iam_policy_document" "path_specific_ro_doc" {
       ]
     }
   }
+  // ListBucket must be applied at the root of the bucket
+  statement {
+    sid     = "ListBucketPolicy0"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}",
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}/*"
+    ]
+  }
 }
 
 # Appended to policy name to allow creation of multiple policies on the same bucket.
@@ -70,7 +80,7 @@ data "aws_iam_policy_document" "rw_source_policy_doc" {
   version = "2012-10-17"
 
   statement {
-    sid     = "ReadWritePolicy0"
+    sid     = "ReadWritePolicyRO"
     effect  = "Allow"
     actions = var.read_write_actions
     resources = [
@@ -101,6 +111,16 @@ data "aws_iam_policy_document" "path_specific_rw_doc" {
         "arn:${var.arn_partition}:s3:::${var.bucket_name}/${statement.value}/*"
       ]
     }
+  }
+  // ListBucket must be applied at the root of the bucket
+  statement {
+    sid     = "ListBucketPolicyRW"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}",
+      "arn:${var.arn_partition}:s3:::${var.bucket_name}/*"
+    ]
   }
 }
 
