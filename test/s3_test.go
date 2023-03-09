@@ -29,12 +29,12 @@ func initTestCases() []BucketTestCase {
 			region:           "",
 			tfDir:            "test_examples/minimal",
 			bucket_name:      "",
-			testName:         "TestBucketSinglePath",
+			testName:         "TestBucketSingleReadPath",
 			expectApplyError: false,
 			vars: map[string]interface{}{
 				"test_bucket_name": "",
 				"read_only_paths":  []string{"path/to/ro-folder"},
-				"read_write_paths": []string{"path/to/rw-folder"},
+				"read_write_paths": []string{},
 			},
 			objTestCases: []ObjectTestCase{
 				{
@@ -44,12 +44,6 @@ func initTestCases() []BucketTestCase {
 					expectPassWrite: false,
 				},
 				{
-					key:             "path/to/rw-folder/obj2",
-					encryption:      "AES256",
-					expectPassRead:  true,
-					expectPassWrite: true,
-				},
-				{
 					key:             "other/folder/obj3",
 					encryption:      "AES256",
 					expectPassRead:  false,
@@ -57,6 +51,38 @@ func initTestCases() []BucketTestCase {
 				},
 			},
 		},
+		{
+        			region:           "",
+        			tfDir:            "test_examples/minimal",
+        			bucket_name:      "",
+        			testName:         "TestBucketSingleWritePath",
+        			expectApplyError: false,
+        			vars: map[string]interface{}{
+        				"test_bucket_name": "",
+        				"read_only_paths":  []string{},
+        				"read_write_paths": []string{"path/to/rw-folder"},
+        			},
+        			objTestCases: []ObjectTestCase{
+        				{
+        					key:             "path/to/ro-folder/obj1",
+        					encryption:      "AES256",
+        					expectPassRead:  true,
+        					expectPassWrite: false,
+        				},
+        				{
+        					key:             "path/to/rw-folder/obj2",
+        					encryption:      "AES256",
+        					expectPassRead:  true,
+        					expectPassWrite: true,
+        				},
+        				{
+        					key:             "other/folder/obj3",
+        					encryption:      "AES256",
+        					expectPassRead:  true,
+        					expectPassWrite: false,
+        				},
+        			},
+        		},
 		{
 			region:           "",
 			tfDir:            "test_examples/minimal",
@@ -72,7 +98,7 @@ func initTestCases() []BucketTestCase {
 				{
 					key:             "random/path/obj1",
 					encryption:      "AES256",
-					expectPassRead:  false,
+					expectPassRead:  true,
 					expectPassWrite: false,
 				},
 				{
@@ -103,7 +129,7 @@ func initTestCases() []BucketTestCase {
 					// not setting encryption here to make sure we cannot upload unencrypted objects
 					encryption:      "",
 					key:             "path1/to/rw-folder/obj2",
-					expectPassRead:  false,
+					expectPassRead:  true,
 					expectPassWrite: false,
 				},
 			},
