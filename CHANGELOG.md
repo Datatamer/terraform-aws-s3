@@ -1,5 +1,8 @@
 # Tamr S3 Module Repo
 
+## v1.3.3 - August 9th 2022
+* Fixes a bug with legacy ACLs for S3 buckets
+
 ## v1.3.2 - August 9th 2022
 * Fixes a bug where two resources were controlling server side encryption
 
