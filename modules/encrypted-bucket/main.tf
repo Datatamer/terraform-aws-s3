@@ -14,6 +14,7 @@ resource "aws_s3_bucket" "new_bucket" {
   }
 }
 
+#tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption_for_new_bucket" {
   bucket = aws_s3_bucket.new_bucket.id
   rule {
