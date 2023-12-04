@@ -35,12 +35,6 @@ resource "aws_s3_bucket_policy" "sse_bucket_policy" {
   )
 }
 
-# Sets S3 bucket ACL
-resource "aws_s3_bucket_acl" "acl_for_new_bucket" {
-  bucket = aws_s3_bucket.new_bucket.id
-  acl    = "private"
-}
-
 # Enabling S3 bucket public access block
 resource "aws_s3_bucket_public_access_block" "for_new_bucket" {
   bucket = aws_s3_bucket.new_bucket.id
